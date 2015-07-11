@@ -16,7 +16,7 @@ apply plugin: "maven-publish"
 apply plugin: "maven"
 
 version "0.9.1"
-group = "com.siprell.plugin"
+group = "com.siprell.plugins"
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
 

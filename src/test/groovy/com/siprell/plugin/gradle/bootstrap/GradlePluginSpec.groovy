@@ -181,9 +181,9 @@ class GradlePluginSpec extends Specification {
 
 	static getFilePath() {
 		String root = new File("").absolutePath.toString()
-		String javascripts = "$root/grails-app/assets/javascripts"
+		String javascripts = "$root/src/assets/javascripts"
 		String js = "$javascripts/bootstrap"
-		String stylesheets = "$root/grails-app/assets/stylesheets"
+		String stylesheets = "$root/src/assets/stylesheets"
 		String css = "$stylesheets/bootstrap/css"
 		String fonts = "$stylesheets/bootstrap/fonts"
 		String less = "$stylesheets/bootstrap/less"

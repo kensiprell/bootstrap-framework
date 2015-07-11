@@ -5,41 +5,25 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskExecutionException
 
-/*
-TODO
-Add to README.md:
-
-Do not use the bootstrap subdirectories because the plugin might delete them.
-
-./gradlew bootstrapFameworkCurrentVersion
-./gradlew bFCV
-./gradlew bootstrapFrameworkDefaultVersion
-./gradlew bFDV
-
-buildscript {
-	ext {
-	    // Bootstrap Framework releases:  https://github.com/twbs/bootstrap/tags
-		bootstrapFrameworkVersion = "3.3.5" 
-		bootstrapFrameworkUseIndividualJs = true
-		bootstrapFrameworkUseLess = true
-	}
-}
-*/
-
 class BootstrapGradlePlugin implements Plugin<Project> {
 	final DEFAULT_VERSION = "3.3.5"
-	
+
 	void apply(Project project) {
-//
-//		String bootstrapFrameworkVersion = project.hasProperty("bootstrapFrameworkVersion") ? project.bootstrapFrameworkVersion : DEFAULT_VERSION
-//		boolean useIndividualJs = project.hasProperty("bootstrapFrameworkUseIndividualJs") ? project.bootstrapFrameworkUseIndividualJs : false
-//		boolean useLess = project.hasProperty("bootstrapFrameworkUseLess") ? project.bootstrapFrameworkUseLess : false
+
 		String bootstrapFrameworkVersion = project.bootstrapFrameworkVersion ?: DEFAULT_VERSION
 		boolean useIndividualJs = project.bootstrapFrameworkUseIndividualJs ?: false
 		boolean useLess = project.bootstrapFrameworkUseLess ?: false
 		FileTree bootstrapZipTree
 		String filePrefix = "bootstrap-v"
 		String fileSuffix = ".zip"
+		String bootstrapFrameworkAssetsPath 
+		if (project.hasProperty("bootstrapFrameworkAssetsPath")) {
+			bootstrapFrameworkAssetsPath = project.bootstrapFrameworkAssetsPath
+		} else if (project.extensions.findByName("grails")) {
+			bootstrapFrameworkAssetsPath = "${project.projectDir}grails-app/assets"
+		} else {
+			bootstrapFrameworkAssetsPath = "${project.projectDir}/src/assets"
+		}
 
 		project.afterEvaluate {
 			project.tasks.processResources.dependsOn("createBootstrapJs", "createBootstrapMixins")
@@ -99,7 +83,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		}
 
 		project.task("createBootstrapJsAll", dependsOn: project.tasks.downloadBootstrapZip) {
-			def path = "grails-app/assets/javascripts"
+			def path = "$bootstrapFrameworkAssetsPath/javascripts"
 			def file = "bootstrap-all.js"
 			project.gradle.taskGraph.whenReady { graph ->
 				inputs.file file
@@ -116,7 +100,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		}
 
 		project.task("createBootstrapJs", dependsOn: project.tasks.createBootstrapJsAll) {
-			def path = "grails-app/assets/javascripts/bootstrap"
+			def path = "$bootstrapFrameworkAssetsPath/javascripts/bootstrap"
 			if (!project.file(path).exists()) {
 				project.mkdir(path)
 			}
@@ -146,7 +130,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		}
 
 		project.task("createBootstrapCssAll", dependsOn: project.tasks.downloadBootstrapZip) {
-			def path = "grails-app/assets/stylesheets"
+			def path = "$bootstrapFrameworkAssetsPath/stylesheets"
 			def file = "bootstrap-all.css"
 			project.gradle.taskGraph.whenReady { graph ->
 				inputs.file file
@@ -165,7 +149,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		}
 
 		project.task("createBootstrapFonts", dependsOn: project.tasks.createBootstrapCssAll) {
-			def path = "grails-app/assets/stylesheets/bootstrap/fonts"
+			def path = "$bootstrapFrameworkAssetsPath/stylesheets/bootstrap/fonts"
 			if (!project.file(path).exists()) {
 				project.mkdir(path)
 			}
@@ -185,7 +169,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		}
 
 		project.task("createBootstrapCssIndividual", dependsOn: project.tasks.createBootstrapFonts) {
-			def path = "grails-app/assets/stylesheets/bootstrap/css"
+			def path = "$bootstrapFrameworkAssetsPath/stylesheets/bootstrap/css"
 			if (!project.file(path).exists()) {
 				project.mkdir(path)
 			}
@@ -206,7 +190,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		}
 
 		project.task("createBootstrapLessAll", dependsOn: project.tasks.createBootstrapCssIndividual) {
-			def path = "grails-app/assets/stylesheets"
+			def path = "$bootstrapFrameworkAssetsPath/stylesheets"
 			def file = "bootstrap-less.less"
 			project.gradle.taskGraph.whenReady { graph ->
 				inputs.file file
@@ -236,7 +220,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		}
 
 		project.task("createBootstrapLess", dependsOn: project.tasks.createBootstrapLessAll) {
-			def path = "grails-app/assets/stylesheets/bootstrap/less"
+			def path = "$bootstrapFrameworkAssetsPath/stylesheets/bootstrap/less"
 			def files = bootstrapZipTree.matching {
 				include "*/less/*.less"
 			}.collect()
@@ -257,7 +241,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		}
 
 		project.task("createBootstrapMixins", dependsOn: project.tasks.createBootstrapLess) {
-			def path = "grails-app/assets/stylesheets/bootstrap/less/mixins"
+			def path = "$bootstrapFrameworkAssetsPath/stylesheets/bootstrap/less/mixins"
 			if (useLess && !project.file(path).exists()) {
 				project.mkdir(path)
 			}
