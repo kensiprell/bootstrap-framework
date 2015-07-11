@@ -21,8 +21,10 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 			bootstrapFrameworkAssetsPath = project.bootstrapFrameworkAssetsPath
 		} else if (project.extensions.findByName("grails")) {
 			bootstrapFrameworkAssetsPath = "${project.projectDir}grails-app/assets"
-		} else {
+		} else if (project.extensions.findByName("assets")) {
 			bootstrapFrameworkAssetsPath = "${project.projectDir}/src/assets"
+		} else {
+			bootstrapFrameworkAssetsPath = "${project.projectDir}/src/main/webapp/resources"
 		}
 
 		project.afterEvaluate {
