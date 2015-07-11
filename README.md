@@ -10,25 +10,32 @@ If you have a question, suggestion, or want to report a bug, please submit an [i
 
 * The plugin supports the [asset-pipeline-core](https://github.com/bertramdev/asset-pipeline-core) plugin and its [less-asset-pipeline](https://github.com/bertramdev/less-asset-pipeline) module out of the box.
 
+### Sample Application
+
+This Grails [sample application](https://github.com/kensiprell/bootstrap-framework-sample) demonstrates how to use the plugin.
+
 ### Installation
 
 Add the following lines to your application's ```build.gradle``` changing the properties as necessary. The commented-out lines are not required for the plugin to work. 
 
     buildscript {
         ext {
-            // The property below allows you to use a Bootstrap version other than the one shipped with the plugin.
+            bootstrapFrameworkAssetsPath = "grails-app/assets"
+            // Uncomment to use a Bootstrap version other than the one shipped with the plugin.
             //bootstrapFrameworkVersion = "3.3.4"
-            // Use the property below to set the location where the Bootstrap files will be copied.
-            //bootstrapFrameworkAssetsPath = "src/main/webapp/resources/bootstrap"
-            // Uncomment to use individual JavaScript files in your manifests or asset-pipeline tags.
+            // Uncomment to use individual JavaScript files.
             //bootstrapFrameworkUseIndividualJs = true
-            // Uncomment to use LESS files (requires the less-asset-pipeline plugin).
+            // Uncomment to use LESS files.
             //bootstrapFrameworkUseLess = true
         }
         repositories {
             jcenter()
         }
+        dependencies {
+            classpath "com.siprell.plugins:bootstrap-framework-gradle:0.9.1"
+        }
     }
+
 
 Add the following line to the root of your application's ```build.gradle```:
 
@@ -36,15 +43,7 @@ Add the following line to the root of your application's ```build.gradle```:
         
 ### How the Plugin Works
 
-The plugin downloads the appropriate Bootstrap zip file and copies it to your application's ```build/tmp``` directory. The plugin will extract the necessary files and copy them to an application directory using the logic below. 
-
-* If you set the ```bootstrapFrameworkAssetsPath``` property, the plugin will use that location.
-
-* If you use the plugin in a Grails application, the plugin will use ```grails-app/assets```.
-
-* If you use the plugin in a non-Grails application with the asset-pipeline plugin, it will use  ```src/assets```.
-
-* Otherwise, it will use ```src/main/webapp/resources``` as its root directory.
+The plugin downloads the appropriate Bootstrap zip file and copies it to your application's ```build/tmp``` directory. The plugin will extract the necessary files and copy them to the   directory defined by the ```bootstrapFrameworkAssetsPath``` property.
 
 The Bootstrap files are copied into directory tree shown below. which is the one used by the asset-pipeline plugin. It is important that you do not put any files in the two ```bootstrap``` directories because they will be overwritten.
 
@@ -77,7 +76,20 @@ The Bootstrap files are copied into directory tree shown below. which is the one
     |    |    |    |    |    background-variant.less
     |    |    |    |    |    etc.
 
+### User Tasks
 
+The plugin comes with two tasks that show Bootstrap Framework versions.
+
+#### Current Version
+The command below shows the version configured in your ```build.gradle``` file.
+
+    gradle bootstrapFrameworkCurrentVersion
+
+#### Default Version
+The command below shows the default version used by the plugin.
+
+    gradle bootstrapFrameworkDefaultVersion
+    
 ### Asset Pipeline Usage
 
 The remaining sections demonstrate how to include the Bootstrap Framework in your application using the asset-pipeline-core plugin and its less-asset-pipeline module. 
