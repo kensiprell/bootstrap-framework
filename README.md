@@ -25,6 +25,9 @@ Add the following lines to your application's ```build.gradle``` changing the pr
             // Uncomment to use LESS files (requires the less-asset-pipeline plugin).
             //bootstrapFrameworkUseLess = true
         }
+        repositories {
+            jcenter()
+        }
     }
 
 Add the following line to the root of your application's ```build.gradle```:
