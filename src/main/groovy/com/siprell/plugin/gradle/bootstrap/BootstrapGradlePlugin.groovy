@@ -18,7 +18,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		String fileSuffix = ".zip"
 		String bootstrapFrameworkAssetsPath 
 		if (project.hasProperty("bootstrapFrameworkAssetsPath")) {
-			bootstrapFrameworkAssetsPath = project.bootstrapFrameworkAssetsPath
+			bootstrapFrameworkAssetsPath = "${project.projectDir}/${project.bootstrapFrameworkAssetsPath}"
 		} else if (project.extensions.findByName("grails")) {
 			bootstrapFrameworkAssetsPath = "${project.projectDir}grails-app/assets"
 		} else if (project.extensions.findByName("assets")) {
