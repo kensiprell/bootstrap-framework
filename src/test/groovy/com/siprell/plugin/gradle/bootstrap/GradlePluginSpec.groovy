@@ -1,4 +1,4 @@
-package grails.plugin.bootstrap
+package com.siprell.plugin.gradle.bootstrap
 
 import java.text.SimpleDateFormat
 import org.gradle.api.Project
@@ -168,7 +168,7 @@ class GradlePluginSpec extends Specification {
 		project.ext.bootstrapFrameworkVersion = version
 		project.ext.bootstrapFrameworkUseIndividualJs = useIndividualJs
 		project.ext.bootstrapFrameworkUseLess = useLess
-		project.pluginManager.apply "grails-bootstrap-framework"
+		project.pluginManager.apply "bootstrap-framework-gradle"
 		project.tasks["createBootstrapJsAll"].execute()
 		project.tasks["createBootstrapJs"].execute()
 		project.tasks["createBootstrapCssAll"].execute()
@@ -180,7 +180,7 @@ class GradlePluginSpec extends Specification {
 	}
 
 	static getFilePath() {
-		String root = new File("").absolutePath.toString().minus("buildSrc")
+		String root = new File("").absolutePath.toString()
 		String javascripts = "$root/grails-app/assets/javascripts"
 		String js = "$javascripts/bootstrap"
 		String stylesheets = "$root/grails-app/assets/stylesheets"

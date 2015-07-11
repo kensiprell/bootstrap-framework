@@ -1,4 +1,4 @@
-package grails.plugin.bootstrap
+package com.siprell.plugin.gradle.bootstrap
 
 import org.gradle.api.file.FileTree
 import org.gradle.api.Plugin

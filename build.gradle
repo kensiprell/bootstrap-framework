@@ -15,7 +15,8 @@ apply plugin: "groovy"
 apply plugin: "maven-publish"
 apply plugin: "maven"
 
-group = "com.siprell.plugins"
+version "0.9.1"
+group = "com.siprell.plugin"
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
 
