@@ -9,8 +9,18 @@ class GradlePluginSpec extends Specification {
 
 	static final bootstrapDefaultVersion = "3.3.5"
 	static final bootstrapTestVersion = "3.3.4"
+	static final grailsJsPath = "grails-app/assets/javascripts"
+	static final grailsCssPath = "grails-app/assets/stylesheets"
+	static final jsPath = "src/main/webapp/resources/js"
+	static final cssPath = "src/main/webapp/resources/css"
+	static boolean useAssetPipeline
 
 	def setup() {
+		useAssetPipeline = true
+		deleteTestFiles()
+	}
+
+	def cleanupSpec() {
 		deleteTestFiles()
 	}
 
@@ -52,6 +62,37 @@ class GradlePluginSpec extends Specification {
 		data.bootstrapAllCss.exists()
 		!data.bootstrapLessLess.exists()
 		data.stylesheetsCount == 2
+		data.stylesheetsBootstrapCount == 2
+		data.bootstrapCss.exists()
+		data.bootstrapThemeCss.exists()
+		data.css.exists()
+		data.cssCount == 2
+		data.fonts.exists()
+		data.fontsCount == 5
+		!data.bootstrapLess.exists()
+		!data.mixinsLess.exists()
+		!data.less.exists()
+		data.lessCount == 0
+		!data.mixins.exists()
+		data.mixinsCount == 0
+	}
+
+	void "apply plugin without asset-pipeline"() {
+		given:
+		useAssetPipeline = false
+		createProject(true, false, false)
+
+		when:
+		def data = currentData
+
+		then:
+		!data.bootstrapAllJs.exists()
+		data.javascriptsCount == 1
+		data.bootstrapJs.exists()
+		data.jsCount == 1
+		!data.bootstrapAllCss.exists()
+		!data.bootstrapLessLess.exists()
+		data.stylesheetsCount == 1
 		data.stylesheetsBootstrapCount == 2
 		data.bootstrapCss.exists()
 		data.bootstrapThemeCss.exists()
@@ -158,16 +199,20 @@ class GradlePluginSpec extends Specification {
 	}
 
 	static deleteTestFiles() {
-	    new File("$filePath.stylesheets").listFiles().each { it.delete() }
-	    new File("$filePath.javascripts").listFiles().each { it.delete() }
+	    new File("$filePath.root/grails-app").deleteDir()
+	    new File("$filePath.root/src/main/webapp").deleteDir()
 	}
 
 	static createProject(boolean defaultVersion, boolean useIndividualJs, boolean useLess) {
 		Project project = ProjectBuilder.builder().withProjectDir(new File(filePath.root)).build()
 		String version = defaultVersion ? bootstrapDefaultVersion : bootstrapTestVersion
-		project.ext.bootstrapFrameworkVersion = version
-		project.ext.bootstrapFrameworkUseIndividualJs = useIndividualJs
-		project.ext.bootstrapFrameworkUseLess = useLess
+		project.ext.bootstrapFramework = [
+			version        : version,
+			cssPath        : filePath.stylesheets,
+			jsPath         : filePath.javascripts,
+			useIndividualJs: useIndividualJs,
+			useLess        : useLess
+		]
 		project.pluginManager.apply "bootstrap-framework-gradle"
 		project.tasks["createBootstrapJsAll"].execute()
 		project.tasks["createBootstrapJs"].execute()
@@ -181,9 +226,9 @@ class GradlePluginSpec extends Specification {
 
 	static getFilePath() {
 		String root = new File("").absolutePath.toString()
-		String javascripts = "$root/src/main/webapp/resources/javascripts"
+		String javascripts = useAssetPipeline ? grailsJsPath : jsPath
+		String stylesheets = useAssetPipeline ? grailsCssPath : cssPath
 		String js = "$javascripts/bootstrap"
-		String stylesheets = "$root/src/main/webapp/resources/stylesheets"
 		String css = "$stylesheets/bootstrap/css"
 		String fonts = "$stylesheets/bootstrap/fonts"
 		String less = "$stylesheets/bootstrap/less"

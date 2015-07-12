@@ -16,17 +16,17 @@ This Grails [sample application](https://github.com/kensiprell/bootstrap-framewo
 
 ### Installation
 
-Add the following lines to your application's ```build.gradle``` changing the properties as necessary. The commented-out lines are not required for the plugin to work. 
+Add the following lines to the ```buildscript``` closure in your application's ```build.gradle``` file. The commented-out lines show the plugin default values, and if you are using Grails, they are not required for the plugin to work. See the [Configuration Options](https://github.com/kensiprell/bootstrap-framework-gradle#configuration-optinos) section for the details.
 
     buildscript {
         ext {
-            bootstrapFrameworkAssetsPath = "grails-app/assets"
-            // Uncomment to use a Bootstrap version other than the one shipped with the plugin.
-            //bootstrapFrameworkVersion = "3.3.4"
-            // Uncomment to use individual JavaScript files.
-            //bootstrapFrameworkUseIndividualJs = true
-            // Uncomment to use LESS files.
-            //bootstrapFrameworkUseLess = true
+             //bootstrapFramework = [
+             //    version         : "3.3.5",
+             //    cssPath         : "grails-app/assets/stylesheets",
+             //    jsPath          : "grails-app/assets/javascripts",
+             //    useIndividualJs : false,
+             //    useLess         : false
+             //]
         }
         repositories {
             jcenter()
@@ -37,62 +37,98 @@ Add the following lines to your application's ```build.gradle``` changing the pr
     }
 
 
-Add the following line to the root of your application's ```build.gradle```:
+Add the following line to the root of your application's ```build.gradle```file.
 
     apply plugin: "bootstrap-framework-gradle"
         
+### Configuration Options
+
+The following options can be configured in the ```bootstrapFramework``` Map.
+
+#### version
+
+Use the property below to change the Bootstrap Framework version used by your application.
+
+    version : "3.3.1"
+
+#### cssPath
+
+Use the property below to define the location where the Bootstrap CSS, fonts, and LESS files are copied.  
+    
+    cssPath : "src/main/web-app/resources/css"
+    
+#### jsPath
+    
+Use the property below to define the location where the Bootstrap JavaScript files are copied.  
+    
+    jsPath : "src/main/web-app/resources/js"
+    
+#### useIndividualJs
+
+If the property below is set to ```true```, the plugin will copy all individual JavaScript files to ```"${bootstrapFramework.jsPath}/bootstrap"```. Otherwise, it will only copy the bootstrap.js file to the directory.
+    
+    useIndividualJs : true
+    
+#### useLess
+
+If the property below is set to ```true```, the plugin will copy all LESS and mixin files to ```"${bootstrapFramework.cssPath}/bootstrap/less"```.
+
+    useLess : true
+
 ### How the Plugin Works
 
-The plugin downloads the appropriate Bootstrap zip file and copies it to your application's ```build/tmp``` directory. The plugin will extract the necessary files and copy them to the   directory defined by the ```bootstrapFrameworkAssetsPath``` property.
+The plugin downloads the appropriate Bootstrap zip file and copies it to your application's ```build/tmp``` directory. The plugin will extract the necessary files and copy them to the directories defined by the ```bootstrapFramework.cssPath``` and ```bootstrapFramework.jsPath``` properties.
 
-The Bootstrap files are copied into directory tree shown below. which is the one used by the asset-pipeline plugin. It is important that you do not put any files in the two ```bootstrap``` directories because they will be overwritten.
+The Bootstrap files are copied into the directory trees shown below. It is important that you do not put any files in the two ```bootstrap``` directories because they will be overwritten.
 
-    |----javascripts/
-    |    |    bootstrap-all.js
-    |    |----bootstrap/
-    |    |    |    affix.js
-    |    |    |    alert.js
-    |    |    |    bootstrap.js
+The ```bootstrap-all.js```, ```bootstrap-all.css```, and ```bootstrap-less.less``` files are generated for the asset-pipeline plugin if you are using Grails or the word "assets" is contained in ```bootstrapFramework.jsPath``` property.
+
+Directory ```bootstrapFramework.jsPath```:
+
+    |    bootstrap-all.js
+    |----bootstrap/
+    |    |    affix.js
+    |    |    alert.js
+    |    |    bootstrap.js
+    |    |    etc.
+
+Directory ```bootstrapFramework.cssPath```:
+
+    |    bootstrap-all.css
+    |    bootstrap-less.less
+    |----bootstrap/
+    |    |----css/
+    |    |    |    bootstrap-theme.css
+    |    |    |    bootstrap.css
+    |    |----fonts/
+    |    |    |    glyphicons-halflings-regular.eot
+    |    |    |    glyphicons-halflings-regular.svg
+    |    |    |    glyphicons-halflings-regular.ttf
+    |    |    |    glyphicons-halflings-regular.woff
+    |    |    |    glyphicons-halflings-regular.woff2
+    |    |----less/
+    |    |    |    alerts.less
+    |    |    |    badges.less
     |    |    |    etc.
-    |----stylesheets/
-    |    |    bootstrap-all.css
-    |    |    bootstrap-less.less
-    |    |----bootstrap/
-    |    |    |----css/
-    |    |    |    |    bootstrap-theme.css
-    |    |    |    |    bootstrap.css
-    |    |    |----fonts/
-    |    |    |    |    glyphicons-halflings-regular.eot
-    |    |    |    |    glyphicons-halflings-regular.svg
-    |    |    |    |    glyphicons-halflings-regular.ttf
-    |    |    |    |    glyphicons-halflings-regular.woff
-    |    |    |    |    glyphicons-halflings-regular.woff2
-    |    |    |----less/
+    |    |    |----mixins/
     |    |    |    |    alerts.less
-    |    |    |    |    badges.less
+    |    |    |    |    background-variant.less
     |    |    |    |    etc.
-    |    |    |    |----mixins/
-    |    |    |    |    |    alerts.less
-    |    |    |    |    |    background-variant.less
-    |    |    |    |    |    etc.
 
-### User Tasks
+### User Task
 
-The plugin comes with two tasks that show Bootstrap Framework versions.
+The plugin comes with a user-land task that shows the Bootstrap Framework versions.
 
-#### Current Version
-The command below shows the version configured in your ```build.gradle``` file.
-
-    gradle bootstrapFrameworkCurrentVersion
-
-#### Default Version
-The command below shows the default version used by the plugin.
-
-    gradle bootstrapFrameworkDefaultVersion
+    gradle bootstrapFrameworkVersions
     
+The output will be similar to:
+
+    3.3.5 is the default Bootstrap Framework version.
+    3.3.2 is the current Bootstrap Framework version.
+   
 ### Asset Pipeline Usage
 
-The remaining sections demonstrate how to include the Bootstrap Framework in your application using the asset-pipeline-core plugin and its less-asset-pipeline module. 
+The remaining sections demonstrate how to include the Bootstrap Framework in your application using the ```asset-pipeline-core``` plugin and its ```less-asset-pipeline``` module. 
 
 ### JavaScript
 
