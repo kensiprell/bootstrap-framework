@@ -8,14 +8,14 @@ buildscript {
 }
 
 plugins {
-    id "com.jfrog.bintray" version "1.2"
+	id "com.jfrog.bintray" version "1.2"
 }
 
 apply plugin: "groovy"
 apply plugin: "maven-publish"
 apply plugin: "maven"
 
-version "0.9.1"
+version "0.9.2"
 group = "com.siprell.plugins"
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
@@ -68,7 +68,6 @@ publishing {
 			}
 			from components.java
 			artifact sourcesJar
-			artifact javadocJar
 		}
 	}
 
@@ -84,22 +83,22 @@ publishing {
 }
 
 bintray {
-	if(project.hasProperty("bintrayUser")) {
-	  user = bintrayUser
-	  key = bintrayKey
+	if (project.hasProperty("bintrayUser")) {
+		user = bintrayUser
+		key = bintrayKey
 	}
-
 	publications = ["maven"]
 	pkg {
 		repo = "gradle-plugins"
 		name = "bootstrap-framework-gradle"
+		desc = "Gradle plugin for integrating the Bootstrap Framework"
+		websiteUrl = "https://github.com/kensiprell/bootstrap-framework-gradle"
+		issueTrackerUrl = "https://github.com/kensiprell/bootstrap-framework-gradle/issues"
+		vcsUrl = "https://github.com/kensiprell/bootstrap-framework-gradle.git"
 		licenses = ["Apache-2.0"]
+		labels = ["bootstrap", "gradle"]
+		publicDownloadNumbers = true
 	}
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-	classifier = "javadoc"
-	from "build/docs/javadoc"
 }
 
 task sourcesJar(type: Jar) {
@@ -108,15 +107,8 @@ task sourcesJar(type: Jar) {
 }
 
 task(console, dependsOn: "classes", type: JavaExec) {
-main = "groovy.ui.Console"
-classpath = sourceSets.main.runtimeClasspath
+	main = "groovy.ui.Console"
+	classpath = sourceSets.main.runtimeClasspath
 }
 
-test {
-	testLogging {
-		exceptionFormat = "full"
-		showStandardStreams = true
-	}
-}
-
-bintrayUpload.dependsOn build, sourcesJar, javadocJar
+bintrayUpload.dependsOn build, sourcesJar
