@@ -48,7 +48,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 					bootstrapZipTree = project.zipTree(bootstrapZipFile)
 				} catch (e) {
 					project.file(bootstrapZipFile).delete()
-					println "Error: Could not download $url.\nYou are not connected to the Internet, or $bootstrapFrameworkVersion is an invalid version number."
+					println "Error: Could not download $url.\nYou are not connected to the Internet, or $version is an invalid version number."
 					List<File> bootstrapZipFiles = []
 					project.file(tmpDir).listFiles().each {
 						if (it.name.startsWith("bootstrap-v")) {
@@ -71,7 +71,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 						bootstrapZipTree = project.zipTree(bootstrapFile)
 						String oldVersion = version
 						version = bootstrapFile.name.minus(filePrefix).minus(fileSuffix)
-						println "Using Bootstrap Framework version $bootstrapFrameworkVersion instead of $oldVersion."
+						println "Using Bootstrap Framework version $version instead of $oldVersion."
 					} else {
 						throw new TaskExecutionException(project.tasks.downloadBootstrapZip, new Throwable("No bootstrap zip file found in $tmpDir."))
 					}
