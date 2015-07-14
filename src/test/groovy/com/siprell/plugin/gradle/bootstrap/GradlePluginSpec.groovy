@@ -214,6 +214,8 @@ class GradlePluginSpec extends Specification {
 			useLess        : useLess
 		]
 		project.pluginManager.apply "bootstrap-framework-gradle"
+		project.tasks["downloadBootstrapZip"].execute()
+		project.tasks["downloadFontAwesomeZip"].execute()
 		project.tasks["createBootstrapJsAll"].execute()
 		project.tasks["createBootstrapJs"].execute()
 		project.tasks["createBootstrapCssAll"].execute()
