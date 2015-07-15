@@ -1,4 +1,4 @@
-## Gradle plugin for integrating the Bootstrap Framework
+## Gradle plugin for integrating the Bootstrap Framework, including Font Awesome
 
 [Bootstrap](http://getbootstrap.com) bills itself as "the most popular HTML, CSS, and JS framework for developing responsive, mobile first projects on the web."
 
@@ -7,6 +7,8 @@ If you have a question, suggestion, or want to report a bug, please submit an [i
 ### Highlights
 
 * The Bootstrap version can be configured in your application's ```build.gradle```, which means you do not have to install a different version of the plugin to get a different Bootstrap version, nor do you have to wait on a plugin update to use the latest Bootstrap release.
+
+* The plugin can also manage [Font Awesome](http://fortawesome.github.io/Font-Awesome/) files, including LESS support.
 
 * The plugin supports the [asset-pipeline-core](https://github.com/bertramdev/asset-pipeline-core) plugin and its [less-asset-pipeline](https://github.com/bertramdev/less-asset-pipeline) module out of the box.
 
@@ -25,7 +27,11 @@ Add the following lines to the ```buildscript``` closure in your application's `
              //    cssPath         : "grails-app/assets/stylesheets",
              //    jsPath          : "grails-app/assets/javascripts",
              //    useIndividualJs : false,
-             //    useLess         : false
+             //    useLess         : false,
+             //    fontAwesome : [
+             //       version : "4.3.0",
+             //       useLess : false
+             //    ]
              //]
         }
         repositories {
@@ -71,9 +77,33 @@ If the property below is set to ```true```, the plugin will copy all individual 
     
 #### useLess
 
-If the property below is set to ```true```, the plugin will copy all LESS and mixin files to ```"${bootstrapFramework.cssPath}/bootstrap/less"```.
+If the property below is set to ```true```, the plugin will copy all Bootstrap Framework LESS and mixin files to ```"${bootstrapFramework.cssPath}/bootstrap/less"```.
 
     useLess : true
+
+#### fontAwesome
+
+If the plugin finds a ```bootstrapFramework.fontAwesome``` property, it will install the Font Awesome fonts using the default plugin version without LESS support.
+
+#### fontAwesome.version
+
+You can change the Font Awesome version by setting the ```bootstrapFramework.fontAwesome.version``` property.
+
+    bootstrapFramework = [
+        fontAwesome : [
+            version : "4.2.0"
+        ]  
+    ]
+
+#### fontAwesome.useLess
+
+You add LESS support for Font Awesome by setting the ```bootstrapFramework.fontAwesome.useLess``` property.
+
+    bootstrapFramework = [
+        fontAwesome : [
+            useLess : true
+        ]  
+    ]
 
 ### How the Plugin Works
 
@@ -114,6 +144,17 @@ Directory ```bootstrapFramework.cssPath```:
     |    |    |    |    alerts.less
     |    |    |    |    background-variant.less
     |    |    |    |    etc.
+    |    font-awesome-all.css
+    |    font-awesome-less.less
+    |    font-awesome/
+    |    |----css/
+    |    |    |    font-awesome.css
+    |    |----fonts/
+    |    |    |    FontAwesome.otf
+    |    |    |    etc.
+    |    |----less/
+    |    |    |    animated.less
+    |    |    |    etc.
 
 ### User Task
 
@@ -124,7 +165,7 @@ The plugin comes with a user-land task that shows the Bootstrap Framework versio
 The output will be similar to:
 
     3.3.5 is the default Bootstrap Framework version.
-    3.3.2 is the current Bootstrap Framework version.
+    4.3.0 is the default Font Awesome version.
    
 ### Asset Pipeline Usage
 
@@ -164,13 +205,15 @@ The instructions below assume the manifest file is in the ```grails-app/assets/s
 
 #### Add all Bootstrap CSS Files
 
-Add the line below to a manifest:
+Add the lines below to a manifest:
 
     *= require bootstrap-all
+    *= require font-awesome-all
   
-Or add the line below to a GSP:
+Or add the lines below to a GSP:
 
     <asset:stylesheet src="bootstrap-all.css"/>
+    <asset:stylesheet src="font-awesome-all.css"/>
 
 #### Add individual Bootstrap CSS Files
 
@@ -186,29 +229,52 @@ Or add the line below to a GSP:
 
 #### Add LESS Files
 
-Add the line below to a manifest:
+Add the lines below to a manifest:
 
     *= require bootstrap-less
+    *= require font-awesome-less
   
 Or add the line below to a GSP:
 
     <asset:stylesheet src="bootstrap-less.css"/>
+    <asset:stylesheet src="font-awesome-less.css"/>
 
 #### LESS Customizations
 
-The create the file below in your application's ```grails-app/assets/stylesheets``` directory when it is first installed. Use it for customizing the framework.
+If LESS support configured, the plugin creates the files below in your application's ```grails-app/assets/stylesheets``` directory when it is first installed. 
+
+Use the file below for customizing the Bootstrap Framework.
 
     /*
-    * This file is for your less and mixin customizations.
-    * It was created by the bootstrap plugin.
+    * This file is for your Bootstrap Framework less and mixin customizations.
+    * It was created by the bootstrap-framework-gradle plugin.
     * It will not be overwritten.
     *
     * You can import all less and mixin files as shown below,
     * or you can import them individually.
-    * See https://github.com/kensiprell/grails3-bootstrap/blob/master/README.md#less
+    * See https://github.com/kensiprell/bootstrap-framework-gradle/blob/master/README.md#less
     */
 
     @import "bootstrap/less/bootstrap.less";
+
+    /*
+    * Your customizations go below this section.
+    */
+
+Use the file below for customizing Font Awesome.
+
+    * Font Awesome by Dave Gandy - http://fontawesome.io
+    *
+    * This file is for your Font Awesome less and mixin customizations.
+    * It was created by the bootstrap-framework-gradle plugin.
+    * It will not be overwritten.
+    *
+    * You can import all less and mixin files as shown below,
+    * or you can import them individually.
+    * See https://github.com/kensiprell/bootstrap-framework-gradle/blob/master/README.md#font-awesome-less
+    */
+
+    @import "font-awesome/less/font-awesome.less";
 
     /*
     * Your customizations go below this section.

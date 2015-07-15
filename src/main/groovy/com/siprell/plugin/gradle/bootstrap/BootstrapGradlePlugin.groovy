@@ -24,7 +24,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		boolean useAssetPipeline = jsPath.contains("assets")
 		
 		FileTree bootstrapZipTree
-		// FontAwesome properties
+		// Font Awesome properties
 		def fontAwesome = properties.fontAwesome
 		boolean useFontAwesome = properties.fontAwesome ? true : false
 		String fontAwesomeVersion = fontAwesome?.version ?: FA_DEFAULT_VERSION
@@ -37,7 +37,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 
 		project.task("bootstrapFrameworkVersions") << {
 			println "$BOOTSTRAP_DEFAULT_VERSION is the default Bootstrap Framework version."
-			println "$FA_DEFAULT_VERSION is the default FontAwesome version."
+			println "$FA_DEFAULT_VERSION is the default Font Awesome version."
 		}
 
 		project.task("downloadBootstrapZip") {
@@ -52,7 +52,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 
 		project.task("downloadFontAwesomeZip", dependsOn: project.tasks.downloadBootstrapZip) {
 		    if (useFontAwesome) {
-    			String description = "FontAwesome"
+    			String description = "Font Awesome"
 	    		String filePrefix = "fontAwesome-v"
 	    		String url = "http://fontawesome.io/assets/font-awesome-${fontAwesomeVersion}.zip"
 	    		String zipFilename = "${filePrefix}${fontAwesomeVersion}.zip"
@@ -343,7 +343,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 					fontAwesomeLess.text = """/*
 * Font Awesome by Dave Gandy - http://fontawesome.io
 *
-* This file is for your FontAwesome less and mixin customizations.
+* This file is for your Font Awesome less and mixin customizations.
 * It was created by the bootstrap-framework-gradle plugin.
 * It will not be overwritten.
 *
