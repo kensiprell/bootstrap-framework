@@ -77,6 +77,14 @@ class GradlePluginSpec extends Specification {
 		data.lessCount == 0
 		!data.mixins.exists()
 		data.mixinsCount == 0
+    	!data.fontAwesomeAllCss.exists()           
+		!data.fontAwesomeLessLess.exists()          
+		data.stylesheetsFontAwesomeCount == 0
+		!data.fontAwesomeCss.exists()              
+		!data.fontAwesomeFonts.exists()            
+	    data.fontAwesomeFontsCount == 0      
+	    !data.fontAwesomeLess.exists()             
+        data.fontAwesomeLessCount == 0      
 	}
 
 	void "apply plugin without asset-pipeline"() {
@@ -108,6 +116,14 @@ class GradlePluginSpec extends Specification {
 		data.lessCount == 0
 		!data.mixins.exists()
 		data.mixinsCount == 0
+    	!data.fontAwesomeAllCss.exists()           
+		!data.fontAwesomeLessLess.exists()          
+		data.stylesheetsFontAwesomeCount == 0
+		!data.fontAwesomeCss.exists()              
+		!data.fontAwesomeFonts.exists()            
+	    data.fontAwesomeFontsCount == 0      
+	    !data.fontAwesomeLess.exists()             
+        data.fontAwesomeLessCount == 0      
 	}
 
 	void "apply plugin using individual JavaScript files"() {
@@ -138,6 +154,14 @@ class GradlePluginSpec extends Specification {
 		data.lessCount == 0
 		!data.mixins.exists()
 		data.mixinsCount == 0
+    	!data.fontAwesomeAllCss.exists()           
+		!data.fontAwesomeLessLess.exists()          
+		data.stylesheetsFontAwesomeCount == 0
+		!data.fontAwesomeCss.exists()              
+		!data.fontAwesomeFonts.exists()            
+	    data.fontAwesomeFontsCount == 0      
+	    !data.fontAwesomeLess.exists()             
+        data.fontAwesomeLessCount == 0      
 	}
 
 	void "apply plugin using LESS support"() {
@@ -168,6 +192,14 @@ class GradlePluginSpec extends Specification {
 		data.lessCount == 42
 		data.mixins.exists()
 		data.mixinsCount == 30
+    	!data.fontAwesomeAllCss.exists()           
+		!data.fontAwesomeLessLess.exists()          
+		data.stylesheetsFontAwesomeCount == 0
+		!data.fontAwesomeCss.exists()              
+		!data.fontAwesomeFonts.exists()            
+	    data.fontAwesomeFontsCount == 0      
+	    !data.fontAwesomeLess.exists()             
+        data.fontAwesomeLessCount == 0      
 	}
 
 	void "apply plugin using LESS support and individual JavaScript files"() {
@@ -198,6 +230,90 @@ class GradlePluginSpec extends Specification {
 		data.lessCount == 42
 		data.mixins.exists()
 		data.mixinsCount == 30
+    	!data.fontAwesomeAllCss.exists()           
+		!data.fontAwesomeLessLess.exists()          
+		data.stylesheetsFontAwesomeCount == 0
+		!data.fontAwesomeCss.exists()              
+		!data.fontAwesomeFonts.exists()            
+	    data.fontAwesomeFontsCount == 0      
+	    !data.fontAwesomeLess.exists()             
+        data.fontAwesomeLessCount == 0      
+	}
+
+	void "apply plugin using default bootstrap and fontawesome settings"() {
+		given:
+		createProject(true, false, false, true, true, false)
+
+		when:
+		def data = currentData
+
+		then:
+		data.bootstrapAllJs.exists()
+		data.javascriptsCount == 2
+		data.bootstrapJs.exists()
+		data.jsCount == 1
+		data.bootstrapAllCss.exists()
+		!data.bootstrapLessLess.exists()
+		data.stylesheetsCount == 4
+		data.stylesheetsBootstrapCount == 2
+		data.bootstrapCss.exists()
+		data.bootstrapThemeCss.exists()
+		data.css.exists()
+		data.cssCount == 2
+		data.fonts.exists()
+		data.fontsCount == 5
+		!data.bootstrapLess.exists()
+		!data.mixinsLess.exists()
+		!data.less.exists()
+		data.lessCount == 0
+		!data.mixins.exists()
+		data.mixinsCount == 0
+    	data.fontAwesomeAllCss.exists()           
+		!data.fontAwesomeLessLess.exists()          
+		data.stylesheetsFontAwesomeCount == 2
+		data.fontAwesomeCss.exists()              
+		data.fontAwesomeFonts.exists()            
+	    data.fontAwesomeFontsCount == 6     
+	    !data.fontAwesomeLess.exists()             
+        data.fontAwesomeLessCount == 0      
+	}
+
+	void "apply plugin using default bootstrap and fontawesome with less"() {
+		given:
+		createProject(true, false, false, true, true, true)
+
+		when:
+		def data = currentData
+
+		then:
+		data.bootstrapAllJs.exists()
+		data.javascriptsCount == 2
+		data.bootstrapJs.exists()
+		data.jsCount == 1
+		data.bootstrapAllCss.exists()
+		!data.bootstrapLessLess.exists()
+		data.stylesheetsCount == 5
+		data.stylesheetsBootstrapCount == 2
+		data.bootstrapCss.exists()
+		data.bootstrapThemeCss.exists()
+		data.css.exists()
+		data.cssCount == 2
+		data.fonts.exists()
+		data.fontsCount == 5
+		!data.bootstrapLess.exists()
+		!data.mixinsLess.exists()
+		!data.less.exists()
+		data.lessCount == 0
+		!data.mixins.exists()
+		data.mixinsCount == 0
+    	data.fontAwesomeAllCss.exists()           
+		data.fontAwesomeLessLess.exists()          
+		data.stylesheetsFontAwesomeCount == 3
+		data.fontAwesomeCss.exists()              
+		data.fontAwesomeFonts.exists()            
+	    data.fontAwesomeFontsCount == 6     
+	    data.fontAwesomeLess.exists()             
+        data.fontAwesomeLessCount == 13      
 	}
 
 	static deleteTestFiles() {
@@ -305,27 +421,46 @@ class GradlePluginSpec extends Specification {
 		def lessCount = less.exists() ? less.listFiles().size() : 0
 		def mixins = new File(filePath.mixins)
 		def mixinsCount = mixins.exists() ? mixins.listFiles().size() : 0
+		// FontAwesome
+		def fontAwesomeAllCss = new File("${filePath.stylesheets}/font-awesome-all.css")
+		def fontAwesomeLessLess = new File("${filePath.stylesheets}/font-awesome-less.less")
+		def stylesheetsFontAwesome = new File("${filePath.stylesheets}/font-awesome")
+		def stylesheetsFontAwesomeCount = stylesheetsFontAwesome.exists() ? stylesheetsFontAwesome.listFiles().size() : 0
+		def fontAwesomeCss = new File("${filePath.faCss}/font-awesome.css")
+		def fontAwesomeFonts = new File(filePath.faFonts)
+		def fontAwesomeFontsCount = fontAwesomeFonts.exists() ? fontAwesomeFonts.listFiles().size() : 0
+		def fontAwesomeLess = new File(filePath.faLess)
+		def fontAwesomeLessCount = fontAwesomeLess.exists() ? fontAwesomeLess.listFiles().size() : 0
+		
 		[
-			bootstrapAllJs   : bootstrapAllJs,
-			javascriptsCount : javascriptsCount,
-			bootstrapJs      : bootstrapJs,
-			jsCount          : jsCount,
-			bootstrapAllCss  : bootstrapAllCss,
-			bootstrapLessLess: bootstrapLessLess,
-			stylesheetsCount : stylesheetsCount,
-			stylesheetsBootstrapCount: stylesheetsBootstrapCount,
-			bootstrapCss     : bootstrapCss,
-			bootstrapThemeCss: bootstrapThemeCss,
-			css              : css,
-			cssCount         : cssCount,
-			fonts            : fonts,
-			fontsCount       : fontsCount,
-			bootstrapLess    : bootstrapLess,
-			mixinsLess       : mixinsLess,
-			less             : less,
-			lessCount        : lessCount,
-			mixins           : mixins,
-			mixinsCount      : mixinsCount
+			bootstrapAllJs              : bootstrapAllJs,
+			javascriptsCount            : javascriptsCount,
+			bootstrapJs                 : bootstrapJs,
+			jsCount                     : jsCount,
+			bootstrapAllCss             : bootstrapAllCss,
+			bootstrapLessLess           : bootstrapLessLess,
+			stylesheetsCount            : stylesheetsCount,
+			stylesheetsBootstrapCount   : stylesheetsBootstrapCount,
+			bootstrapCss                : bootstrapCss,
+			bootstrapThemeCss           : bootstrapThemeCss,
+			css                         : css,
+			cssCount                    : cssCount,
+			fonts                       : fonts,
+			fontsCount                  : fontsCount,
+			bootstrapLess               : bootstrapLess,
+			mixinsLess                  : mixinsLess,
+			less                        : less,
+			lessCount                   : lessCount,
+			mixins                      : mixins,
+			mixinsCount                 : mixinsCount,
+    		fontAwesomeAllCss           : fontAwesomeAllCss,
+		    fontAwesomeLessLess         : fontAwesomeLessLess,
+		    stylesheetsFontAwesomeCount : stylesheetsFontAwesomeCount,
+		    fontAwesomeCss              : fontAwesomeCss,
+		    fontAwesomeFonts            : fontAwesomeFonts,
+		    fontAwesomeFontsCount       : fontAwesomeFontsCount,
+		    fontAwesomeLess             : fontAwesomeLess,
+    		fontAwesomeLessCount        : fontAwesomeLessCount
 		]
 	}
 
