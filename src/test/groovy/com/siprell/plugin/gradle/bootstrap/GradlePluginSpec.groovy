@@ -21,7 +21,7 @@ class GradlePluginSpec extends Specification {
 	}
 
 	def cleanupSpec() {
-		deleteTestFiles()
+	//	deleteTestFiles()
 	}
 
 	// TODO
@@ -211,7 +211,11 @@ class GradlePluginSpec extends Specification {
 			cssPath        : filePath.stylesheets,
 			jsPath         : filePath.javascripts,
 			useIndividualJs: useIndividualJs,
-			useLess        : useLess
+			useLess        : useLess,
+		    fontAwesome : [
+		        version : "4.3.0",
+		        useLess : true
+		        ]
 		]
 		project.pluginManager.apply "bootstrap-framework-gradle"
 		/*project.afterEvaluate {
@@ -242,6 +246,12 @@ class GradlePluginSpec extends Specification {
 		project.tasks["createBootstrapLessAll"].execute()
 		project.tasks["createBootstrapLess"].execute()
 		project.tasks["createBootstrapMixins"].execute()
+		project.tasks["downloadFontAwesomeZip"].execute()
+		project.tasks["createFontAwesomeCssAll"].execute()
+		project.tasks["createFontAwesomeCssIndividual"].execute()
+		project.tasks["createFontAwesomeFonts"].execute()
+		project.tasks["createFontAwesomeLessAll"].execute()
+		project.tasks["createFontAwesomeLess"].execute()
 	}
 
 	static getFilePath() {
