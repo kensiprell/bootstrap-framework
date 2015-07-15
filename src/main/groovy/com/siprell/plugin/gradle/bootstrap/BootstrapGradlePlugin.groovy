@@ -340,6 +340,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 			doLast {
 				def fontAwesomeLess = project.file("$path/$file")
 				if (fontAwesomeInstall && fontAwesomeUseLess) {
+					String faFontPath = cssPath.contains("assets") ? "/assets/font-awesome/fonts" : "/font-awesome/fonts"
 					fontAwesomeLess.text = """/*
 * Font Awesome by Dave Gandy - http://fontawesome.io
 *
@@ -353,6 +354,8 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 */
 
 @import "font-awesome/less/font-awesome.less";
+
+@fa-font-path: "$faFontPath";
 
 /*
 * Your customizations go below this section.
