@@ -96,7 +96,7 @@ bintray {
 		issueTrackerUrl = "https://github.com/kensiprell/bootstrap-framework-gradle/issues"
 		vcsUrl = "https://github.com/kensiprell/bootstrap-framework-gradle.git"
 		licenses = ["Apache-2.0"]
-		labels = ["bootstrap", "gradle"]
+		labels = ["bootstrap", "fontawesome", "font-awesome", "gradle"]
 		publicDownloadNumbers = true
 	}
 }
