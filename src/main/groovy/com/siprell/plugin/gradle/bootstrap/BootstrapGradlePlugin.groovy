@@ -15,6 +15,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 	void apply(Project project) {
 
 		// Shared properties
+		def downloadZipFile = new DownloadZipFile()
 		String tmpDir = "${project.buildDir}/tmp"
 		def properties = project.hasProperty("bootstrapFramework") ? project.bootstrapFramework : [:]
 		// Bootstrap Framework properties
@@ -24,20 +25,22 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		String jsPath = properties.jsPath ? properties.jsPath : "grails-app/assets/javascripts"
 		String cssPath = properties.cssPath ? properties.cssPath : "grails-app/assets/stylesheets"
 		boolean useAssetPipeline = jsPath.contains("assets")
-		String bootstrapZipFilename = "bootstrapFramework.zip"
+		FileTree bootstrapZipTree
 		// FontAwesome properties
 		def fontAwesome = properties.fontAwesome
 		boolean useFontAwesome = properties.fontAwesome ? true : false
 		String fontAwesomeVersion = fontAwesome?.version ?: FA_DEFAULT_VERSION
 		boolean fontAwesomeUseLess = fontAwesome?.useLess ?: false
-		String fontAwesomeZipFilename = "fontAwesome.zip"
+		FileTree fontAwesomeZipTree
 
 		project.afterEvaluate {
+		    // TODO fix this mess
 			project.tasks.createBootstrapJs.mustRunAfter project.tasks.downloadBootstrapZip
 			project.tasks.createBootstrapFonts.mustRunAfter project.tasks.downloadBootstrapZip
 			project.tasks.createBootstrapCssIndividual.mustRunAfter project.tasks.downloadBootstrapZip
 			project.tasks.createBootstrapLess.mustRunAfter project.tasks.downloadBootstrapZip
 			project.tasks.createBootstrapMixins.mustRunAfter project.tasks.downloadBootstrapZip
+
 			project.tasks.processResources.dependsOn(
 				"downloadBootstrapZip",
 				"createBootstrapJsAll",
@@ -51,29 +54,32 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 			)
 		}
 
+
 		project.task("bootstrapFrameworkVersions") << {
 			println "$BOOTSTRAP_DEFAULT_VERSION is the default Bootstrap Framework version."
 			println "$FA_DEFAULT_VERSION is the default FontAwesome version."
 		}
 
-		project.task("downloadBootstrapZip", type: DownloadZipTask) {
-			description = "Bootstrap Framework"
-			filePrefix = "bootstrap-v"
-			tmp = "${project.buildDir}/tmp"
-			version = bootstrapVersion
-			url = "https://github.com/twbs/bootstrap/archive/v${version}.zip"
-			zipFilename = bootstrapZipFilename
-			zipTempFilename = "${filePrefix}${version}.zip"
+		project.task("downloadBootstrapZip") {
+			String description = "Bootstrap Framework"
+			String filePrefix = "bootstrap-v"
+			String url = "https://github.com/twbs/bootstrap/archive/v${bootstrapVersion}.zip"
+			String zipFilename = "${filePrefix}${bootstrapVersion}.zip"
+
+			def zipFile = downloadZipFile.download(tmpDir, description, filePrefix, url, bootstrapVersion, zipFilename)
+			bootstrapZipTree = (zipFile instanceof File) ? project.zipTree(zipFile) : null
 		}
 
-		project.task("downloadFontAwesomeZip", type: DownloadZipTask) {
-			description = "FontAwesome"
-			filePrefix = "fontAwesome-v"
-			tmp = "${project.buildDir}/tmp"
-			version = fontAwesomeVersion
-			url = "http://fontawesome.io/assets/font-awesome-${version}.zip"
-			zipFilename = fontAwesomeZipFilename
-			zipTempFilename = "${filePrefix}${version}.zip"
+		project.task("downloadFontAwesomeZip") {
+		    if (useFontAwesome) {
+    			String description = "FontAwesome"
+	    		String filePrefix = "fontAwesome-v"
+	    		String url = "http://fontawesome.io/assets/font-awesome-${version}.zip"
+	    		String zipFilename = "${filePrefix}${fontAwesomeVersion}.zip"
+		        
+    			def zipFile = downloadZipFile.download(tmpDir, description, filePrefix, url, fontAwesomeVersion, zipFilename)
+    			fontAwesomeZipTree = (zipFile instanceof File) ? project.zipTree(zipFile) : null
+		    }
 		}
 
 		project.task("createBootstrapJsAll") {
@@ -100,8 +106,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 			if (!project.file(path).exists()) {
 				project.mkdir(path)
 			}
-			FileTree zipTree = project.zipTree("$tmpDir/$bootstrapZipFilename")
-			def files = zipTree.matching {
+			def files = bootstrapZipTree.matching {
 				include "*/dist/js/bootstrap.js"
 				if (useIndividualJs) {
 					include "*/js/*.js"
@@ -152,8 +157,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 			if (!project.file(path).exists()) {
 				project.mkdir(path)
 			}
-			FileTree zipTree = project.zipTree("$tmpDir/$bootstrapZipFilename")
-			def files = zipTree.matching {
+			def files = bootstrapZipTree.matching {
 				include "*/fonts/*"
 			}.collect()
 			project.gradle.taskGraph.whenReady { graph ->
@@ -173,8 +177,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 			if (!project.file(path).exists()) {
 				project.mkdir(path)
 			}
-			FileTree zipTree = project.zipTree("$tmpDir/$bootstrapZipFilename")
-			def files = zipTree.matching {
+			def files = bootstrapZipTree.matching {
 				include "*/dist/css/*.css"
 				exclude "*/dist/css/*.min.css"
 			}.collect()
@@ -222,8 +225,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 
 		project.task("createBootstrapLess") {
 			def path = "${project.projectDir}/$cssPath/bootstrap/less"
-			FileTree zipTree = project.zipTree("$tmpDir/$bootstrapZipFilename")
-			def files = zipTree.matching {
+			def files = bootstrapZipTree.matching {
 				include "*/less/*.less"
 			}.collect()
 			project.gradle.taskGraph.whenReady { graph ->
@@ -247,8 +249,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 			if (useLess && !project.file(path).exists()) {
 				project.mkdir(path)
 			}
-			FileTree zipTree = project.zipTree("$tmpDir/$bootstrapZipFilename")
-			def files = zipTree.matching {
+			def files = bootstrapZipTree.matching {
 				include "*/less/mixins/*.less"
 			}.collect()
 			project.gradle.taskGraph.whenReady { graph ->
@@ -269,75 +270,58 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 	}
 }
 
-class DownloadZipTask extends DefaultTask {
+class DownloadZipFile { 
 	String fileSuffix = ".zip"
-	@Input
-	String description
-	@Input
-	String filePrefix
-	@Input
-	String tmp
-	@Input
-	String url
-	@Input
-	String version
-	@Input
-	String zipFilename
-	@Input
-	String zipTempFilename
 
-	@TaskAction
-	def download() {
-		def tmpDirFile = new File("$tmp")
-		if (!tmpDirFile.exists()) {
-			tmpDirFile.mkdir()
+	def download(String tmp, String description, String filePrefix, String url, String version, String zipFilename) {
+	    println "TEST START"
+	    println "TEST tmp: $tmp" 
+	    println "TEST description: $description"
+	    println "TEST filePrefix: $filePrefix"
+	    println "TEST url: $url"
+	    println "TEST version: $version"
+	    println "TEST zipFilename: $zipFilename"
+	    println "TEST END"
+		def tmpDir = new File("$tmp")
+		if (!tmpDir.exists()) {
+			tmpDir.mkdir()
 		}
+    	def zipFile = new File("$tmp/$zipFilename")
+    	if (zipFile.exists()) {
+    	    return zipFile
+    	}
 		try {
-			def file = project.file("$tmp/$zipTempFilename").newOutputStream()
-			file << new URL(url).openStream()
+		    def file = zipFile.newOutputStream()
+			file  << new URL(url).openStream()
 			file.close()
-			project.copy {
-				from file
-				into tmp
-				rename { String fileName ->
-					fileName.replace(zipTempFilename, zipFilename)
-				}
-			}
+			return zipFile
 		} catch (e) {
-			project.file(zipTempFilename).delete()
-			println "Error: Could not download $url.\nYou are not connected to the Internet, or $version is an invalid version number."
+		    zipFile.delete()
+			println "Error: Could not download $url.\n$version is an invalid $description version, or you are not connected to the Internet."
 			List<File> zipFiles = []
-			project.file(tmp).listFiles().each {
+			tmpDir.listFiles().each {
 				if (it.name.startsWith(filePrefix)) {
 					zipFiles << it
 				}
 			}
 			if (zipFiles.size() > 0) {
-				File zipFile
+				File zipFileOld
 				if (zipFiles.size() == 1) {
-					zipFile = zipFiles[0]
+					zipFileOld = zipFiles[0]
 				} else {
-					zipFile = zipFiles.sort(false) { a, b ->
+					zipFileOld = zipFiles.sort(false) { a, b ->
 						def tokens = [a.name.minus(filePrefix).minus(fileSuffix), b.name.minus(filePrefix).minus(fileSuffix)]
 						tokens*.tokenize('.')*.collect { it as int }.with { u, v ->
 							[u, v].transpose().findResult { x, y -> x <=> y ?: null } ?: u.size() <=> v.size()
 						}
 					}[-1]
 				}
-				project.copy {
-					from zipFile
-					into tmp
-					rename { String fileName ->
-						fileName.replace(zipTempFilename, zipFilename)
-					}
-				}
-				String oldVersion = project.version
-				String version = zipFile.name.minus(filePrefix).minus(fileSuffix)
-				println "Using $description version $version instead of $oldVersion."
+				String newVersion = zipFileOld.name.minus(filePrefix).minus(fileSuffix)
+				println "Using $description version $newVersion instead of $version."
+				return zipFileOld
 			} else {
-				// TODO is this the correct exception?
-				//throw new TaskExecutionException(this, new Throwable("No $description zip file found in $tmp."))
-				println "ERROR ERROR ERROR"
+			    // TODO stop tasks execution?
+				println "FATAL ERROR: No $description zip files found in $tmpDir."
 			}
 		}
 	}
