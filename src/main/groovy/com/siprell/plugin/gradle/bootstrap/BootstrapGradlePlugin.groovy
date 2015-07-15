@@ -251,12 +251,19 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		}
 		
 		project.task("createFontAwesomeCssAll", dependsOn: project.tasks.createBootstrapMixins) {
-			def path = "${project.projectDir}/$cssPath"
-			def file = "font-awesome-all.css"
-			project.gradle.taskGraph.whenReady { graph ->
-				inputs.file file
-				outputs.dir path
-			}
+		    if (useFontAwesome) {
+		        def path = "${project.projectDir}/$cssPath"
+			    def file = "font-awesome-all.css"
+			    project.gradle.taskGraph.whenReady { graph ->
+				    inputs.file file
+				    outputs.dir path
+			    }
+		    } else {
+		        def faDir = project.file("${project.projectDir}/$cssPath/font-awesome")
+		        if (faDir.exists()) {
+		            faDir.delete()
+		        }
+		    }
 			doLast {
 				if (useFontAwesome) {
 					def fontAwesomeCss = project.file("$path/$file")
@@ -274,16 +281,18 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		}
 
 		project.task("createFontAwesomeCssIndividual", dependsOn: project.tasks.createFontAwesomeCssAll) {
-			def path = "${project.projectDir}/$cssPath/font-awesome/css"
-			if (!project.file(path).exists()) {
-				project.mkdir(path)
-			}
-			def files = fontAwesomeZipTree.matching {
-				include "*/css/font-awesome.css"
-			}.collect()
-			project.gradle.taskGraph.whenReady { graph ->
-				inputs.file files
-				outputs.dir path
+			if (useFontAwesome) {
+			    def path = "${project.projectDir}/$cssPath/font-awesome/css"
+		    	if (!project.file(path).exists()) {
+		    		project.mkdir(path)
+		    	}
+		    	def files = fontAwesomeZipTree.matching {
+	    			include "*/css/font-awesome.css"
+		    	}.collect()
+	    		project.gradle.taskGraph.whenReady { graph ->
+		    		inputs.file files
+		    		outputs.dir path
+	        	}
 			}
 			doLast {
 				if (useFontAwesome) {
@@ -296,16 +305,18 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		}
 		
 		project.task("createFontAwesomeFonts", dependsOn: project.tasks.createFontAwesomeCssIndividual) {
-			def path = "${project.projectDir}/$cssPath/font-awesome/fonts"
-			if (!project.file(path).exists()) {
-				project.mkdir(path)
-			}
-			def files = fontAwesomeZipTree.matching {
-				include "*/fonts/*"
-			}.collect()
-			project.gradle.taskGraph.whenReady { graph ->
-				inputs.file files
-				outputs.dir path
+			if (useFontAwesome) {
+		    	def path = "${project.projectDir}/$cssPath/font-awesome/fonts"
+		    	if (!project.file(path).exists()) {
+		    		project.mkdir(path)
+			    }
+			    def files = fontAwesomeZipTree.matching {
+				    include "*/fonts/*"
+		    	}.collect()
+		    	project.gradle.taskGraph.whenReady { graph ->
+			    	inputs.file files
+				    outputs.dir path
+			    }
 			}
 			doLast {
 				if (useFontAwesome) {
@@ -318,11 +329,13 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		}
 
 		project.task("createFontAwesomeLessAll", dependsOn: project.tasks.createFontAwesomeFonts) {
-			def path = "${project.projectDir}/$cssPath"
-			def file = "font-awesome-less.less"
-			project.gradle.taskGraph.whenReady { graph ->
-				inputs.file file
-				outputs.dir path
+			if (useFontAwesome) {
+			    def path = "${project.projectDir}/$cssPath"
+			    def file = "font-awesome-less.less"
+			    project.gradle.taskGraph.whenReady { graph ->
+				    inputs.file file
+				    outputs.dir path
+		    	}
 			}
 			doLast {
 				if (fontAwesomeUseLess) {
@@ -350,13 +363,15 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		}
 
 		project.task("createFontAwesomeLess", dependsOn: project.tasks.createFontAwesomeLessAll) {
-			def path = "${project.projectDir}/$cssPath/font-awesome/less"
-			def files = fontAwesomeZipTree.matching {
-				include "*/less/*.less"
-			}.collect()
-			project.gradle.taskGraph.whenReady { graph ->
-				inputs.file files
-				outputs.dir path
+			if (useFontAwesome) {
+			    def path = "${project.projectDir}/$cssPath/font-awesome/less"
+			    def files = fontAwesomeZipTree.matching {
+				    include "*/less/*.less"
+			    }.collect()
+			    project.gradle.taskGraph.whenReady { graph ->
+				    inputs.file files
+				    outputs.dir path
+			    }
 			}
 			doLast {
 				if (fontAwesomeUseLess) {
