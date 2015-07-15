@@ -1,12 +1,8 @@
 package com.siprell.plugin.gradle.bootstrap
 
-import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileTree
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.TaskAction
-import org.gradle.api.tasks.TaskExecutionException
 
 class BootstrapGradlePlugin implements Plugin<Project> {
 	final BOOTSTRAP_DEFAULT_VERSION = "3.3.5"
@@ -18,6 +14,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		def downloadZipFile = new DownloadZipFile()
 		String tmpDir = "${project.buildDir}/tmp"
 		def properties = project.hasProperty("bootstrapFramework") ? project.bootstrapFramework : [:]
+		
 		// Bootstrap Framework properties
 		String bootstrapVersion = properties.version ?: BOOTSTRAP_DEFAULT_VERSION
 		boolean useIndividualJs = properties.useIndividualJs ?: false
@@ -25,6 +22,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		String jsPath = properties.jsPath ? properties.jsPath : "grails-app/assets/javascripts"
 		String cssPath = properties.cssPath ? properties.cssPath : "grails-app/assets/stylesheets"
 		boolean useAssetPipeline = jsPath.contains("assets")
+		
 		FileTree bootstrapZipTree
 		// FontAwesome properties
 		def fontAwesome = properties.fontAwesome
@@ -265,7 +263,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		        }
 		    }
 			doLast {
-				if (useFontAwesome) {
+				if (useFontAwesome && useAssetPipeline) {
 					def fontAwesomeCss = project.file("$path/$file")
 					fontAwesomeCss.text = """/*
 * Font Awesome by Dave Gandy - http://fontawesome.io
