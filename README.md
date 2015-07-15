@@ -29,6 +29,7 @@ Add the following lines to the ```buildscript``` closure in your application's `
              //    useIndividualJs : false,
              //    useLess         : false,
              //    fontAwesome : [
+             //       install : false
              //       version : "4.3.0",
              //       useLess : false
              //    ]
@@ -81,9 +82,15 @@ If the property below is set to ```true```, the plugin will copy all Bootstrap F
 
     useLess : true
 
-#### fontAwesome
+#### fontAwesome.install
 
-If the plugin finds a ```bootstrapFramework.fontAwesome``` property, it will install the Font Awesome fonts using the default plugin version without LESS support.
+If ```bootstrapFramework.fontAwesome.install``` is set to ```true```, the plugin will install the Font Awesome fonts using the default plugin version without LESS support.
+
+    bootstrapFramework = [
+        fontAwesome : [
+            install : true
+        ]  
+    ]
 
 #### fontAwesome.version
 
@@ -91,6 +98,7 @@ You can change the Font Awesome version by setting the ```bootstrapFramework.fon
 
     bootstrapFramework = [
         fontAwesome : [
+            install : true
             version : "4.2.0"
         ]  
     ]
@@ -101,6 +109,7 @@ You add LESS support for Font Awesome by setting the ```bootstrapFramework.fontA
 
     bootstrapFramework = [
         fontAwesome : [
+            install : true
             useLess : true
         ]  
     ]

@@ -14,7 +14,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		def downloadZipFile = new DownloadZipFile()
 		String tmpDir = "${project.buildDir}/tmp"
 		def properties = project.hasProperty("bootstrapFramework") ? project.bootstrapFramework : [:]
-		
+
 		// Bootstrap Framework properties
 		String bootstrapVersion = properties.version ?: BOOTSTRAP_DEFAULT_VERSION
 		boolean useIndividualJs = properties.useIndividualJs ?: false
@@ -22,11 +22,11 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		String jsPath = properties.jsPath ? properties.jsPath : "grails-app/assets/javascripts"
 		String cssPath = properties.cssPath ? properties.cssPath : "grails-app/assets/stylesheets"
 		boolean useAssetPipeline = jsPath.contains("assets")
-		
+
 		FileTree bootstrapZipTree
 		// Font Awesome properties
 		def fontAwesome = properties.fontAwesome
-		boolean useFontAwesome = properties.fontAwesome ? true : false
+		boolean fontAwesomeInstall = fontAwesome?.install ?: false
 		String fontAwesomeVersion = fontAwesome?.version ?: FA_DEFAULT_VERSION
 		boolean fontAwesomeUseLess = fontAwesome?.useLess ?: false
 		FileTree fontAwesomeZipTree
@@ -51,15 +51,15 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		}
 
 		project.task("downloadFontAwesomeZip", dependsOn: project.tasks.downloadBootstrapZip) {
-		    if (useFontAwesome) {
-    			String description = "Font Awesome"
-	    		String filePrefix = "fontAwesome-v"
-	    		String url = "http://fontawesome.io/assets/font-awesome-${fontAwesomeVersion}.zip"
-	    		String zipFilename = "${filePrefix}${fontAwesomeVersion}.zip"
-		        
-    			def zipFile = downloadZipFile.download(tmpDir, description, filePrefix, url, fontAwesomeVersion, zipFilename)
-    			fontAwesomeZipTree = (zipFile instanceof File) ? project.zipTree(zipFile) : null
-		    }
+			if (fontAwesomeInstall) {
+				String description = "Font Awesome"
+				String filePrefix = "fontAwesome-v"
+				String url = "http://fontawesome.io/assets/font-awesome-${fontAwesomeVersion}.zip"
+				String zipFilename = "${filePrefix}${fontAwesomeVersion}.zip"
+
+				def zipFile = downloadZipFile.download(tmpDir, description, filePrefix, url, fontAwesomeVersion, zipFilename)
+				fontAwesomeZipTree = (zipFile instanceof File) ? project.zipTree(zipFile) : null
+			}
 		}
 
 		project.task("createBootstrapJsAll", dependsOn: project.tasks.downloadFontAwesomeZip) {
@@ -247,23 +247,23 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 				}
 			}
 		}
-		
+
 		project.task("createFontAwesomeCssAll", dependsOn: project.tasks.createBootstrapMixins) {
-	        def path = "${project.projectDir}/$cssPath"
-		    def file = "font-awesome-all.css"
-		    if (useFontAwesome) {
-			    project.gradle.taskGraph.whenReady { graph ->
-				    inputs.file file
-				    outputs.dir path
-			    }
-		    } else {
-		        def faDir = project.file("${project.projectDir}/$cssPath/font-awesome")
-		        if (faDir.exists()) {
-		            faDir.delete()
-		        }
-		    }
+			def path = "${project.projectDir}/$cssPath"
+			def file = "font-awesome-all.css"
+			if (fontAwesomeInstall && useAssetPipeline) {
+				project.gradle.taskGraph.whenReady { graph ->
+					inputs.file file
+					outputs.dir path
+				}
+			} else {
+				def faDir = project.file("${project.projectDir}/$cssPath/font-awesome")
+				if (faDir.exists()) {
+					faDir.delete()
+				}
+			}
 			doLast {
-				if (useFontAwesome && useAssetPipeline) {
+				if (fontAwesomeInstall && useAssetPipeline) {
 					def fontAwesomeCss = project.file("$path/$file")
 					fontAwesomeCss.text = """/*
 * Font Awesome by Dave Gandy - http://fontawesome.io
@@ -279,67 +279,67 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		}
 
 		project.task("createFontAwesomeCssIndividual", dependsOn: project.tasks.createFontAwesomeCssAll) {
-		    def path = "${project.projectDir}/$cssPath/font-awesome/css"
-		    def files
-			if (useFontAwesome) {
-		    	if (!project.file(path).exists()) {
-		    		project.mkdir(path)
-		    	}
-		    	files = fontAwesomeZipTree.matching {
-	    			include "*/css/font-awesome.css"
-		    	}.collect()
-	    		project.gradle.taskGraph.whenReady { graph ->
-		    		inputs.file files
-		    		outputs.dir path
-	        	}
+			def path = "${project.projectDir}/$cssPath/font-awesome/css"
+			def files
+			if (fontAwesomeInstall) {
+				if (!project.file(path).exists()) {
+					project.mkdir(path)
+				}
+				files = fontAwesomeZipTree.matching {
+					include "*/css/font-awesome.css"
+				}.collect()
+				project.gradle.taskGraph.whenReady { graph ->
+					inputs.file files
+					outputs.dir path
+				}
 			}
 			doLast {
-				if (useFontAwesome) {
-    				project.copy {
-	    				from files
-	    				into path
-	    			}
+				if (fontAwesomeInstall) {
+					project.copy {
+						from files
+						into path
+					}
 				}
 			}
 		}
-		
+
 		project.task("createFontAwesomeFonts", dependsOn: project.tasks.createFontAwesomeCssIndividual) {
-	    	def path = "${project.projectDir}/$cssPath/font-awesome/fonts"
-	    	def files
-			if (useFontAwesome) {
-		    	if (!project.file(path).exists()) {
-		    		project.mkdir(path)
-			    }
-			    files = fontAwesomeZipTree.matching {
-				    include "*/fonts/*"
-		    	}.collect()
-		    	project.gradle.taskGraph.whenReady { graph ->
-			    	inputs.file files
-				    outputs.dir path
-			    }
+			def path = "${project.projectDir}/$cssPath/font-awesome/fonts"
+			def files
+			if (fontAwesomeInstall) {
+				if (!project.file(path).exists()) {
+					project.mkdir(path)
+				}
+				files = fontAwesomeZipTree.matching {
+					include "*/fonts/*"
+				}.collect()
+				project.gradle.taskGraph.whenReady { graph ->
+					inputs.file files
+					outputs.dir path
+				}
 			}
 			doLast {
-				if (useFontAwesome) {
-    				project.copy {
-	    				from files
-	    				into path
-	    			}
+				if (fontAwesomeInstall) {
+					project.copy {
+						from files
+						into path
+					}
 				}
 			}
 		}
 
 		project.task("createFontAwesomeLessAll", dependsOn: project.tasks.createFontAwesomeFonts) {
-		    def path = "${project.projectDir}/$cssPath"
-		    def file = "font-awesome-less.less"
-			if (useFontAwesome) {
-			    project.gradle.taskGraph.whenReady { graph ->
-				    inputs.file file
-				    outputs.dir path
-		    	}
+			def path = "${project.projectDir}/$cssPath"
+			def file = "font-awesome-less.less"
+			if (fontAwesomeInstall) {
+				project.gradle.taskGraph.whenReady { graph ->
+					inputs.file file
+					outputs.dir path
+				}
 			}
 			doLast {
-				if (fontAwesomeUseLess) {
-					def fontAwesomeLess = project.file("$path/$file")
+				def fontAwesomeLess = project.file("$path/$file")
+				if (fontAwesomeInstall && fontAwesomeUseLess) {
 					fontAwesomeLess.text = """/*
 * Font Awesome by Dave Gandy - http://fontawesome.io
 *
@@ -358,24 +358,26 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 * Your customizations go below this section.
 */
 """
+				} else {
+					fontAwesomeLess.delete()
 				}
 			}
 		}
 
 		project.task("createFontAwesomeLess", dependsOn: project.tasks.createFontAwesomeLessAll) {
-		    def path = "${project.projectDir}/$cssPath/font-awesome/less"
-		    def files
-			if (useFontAwesome) {
-			    files = fontAwesomeZipTree.matching {
-				    include "*/less/*.less"
-			    }.collect()
-			    project.gradle.taskGraph.whenReady { graph ->
-				    inputs.file files
-				    outputs.dir path
-			    }
+			def path = "${project.projectDir}/$cssPath/font-awesome/less"
+			def files
+			if (fontAwesomeInstall) {
+				files = fontAwesomeZipTree.matching {
+					include "*/less/*.less"
+				}.collect()
+				project.gradle.taskGraph.whenReady { graph ->
+					inputs.file files
+					outputs.dir path
+				}
 			}
 			doLast {
-				if (fontAwesomeUseLess) {
+				if (fontAwesomeInstall && fontAwesomeUseLess) {
 					project.copy {
 						from files
 						into path
@@ -389,7 +391,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 	}
 }
 
-class DownloadZipFile { 
+class DownloadZipFile {
 	String fileSuffix = ".zip"
 
 	def download(String tmp, String description, String filePrefix, String url, String version, String zipFilename) {
@@ -397,17 +399,17 @@ class DownloadZipFile {
 		if (!tmpDir.exists()) {
 			tmpDir.mkdir()
 		}
-    	def zipFile = new File("$tmp/$zipFilename")
-    	if (zipFile.exists()) {
-    	    return zipFile
-    	}
+		def zipFile = new File("$tmp/$zipFilename")
+		if (zipFile.exists()) {
+			return zipFile
+		}
 		try {
-		    def file = zipFile.newOutputStream()
-			file  << new URL(url).openStream()
+			def file = zipFile.newOutputStream()
+			file << new URL(url).openStream()
 			file.close()
 			return zipFile
 		} catch (e) {
-		    zipFile.delete()
+			zipFile.delete()
 			println "Error: Could not download $url.\n$version is an invalid $description version, or you are not connected to the Internet."
 			List<File> zipFiles = []
 			tmpDir.listFiles().each {
@@ -431,7 +433,7 @@ class DownloadZipFile {
 				println "Using $description version $newVersion instead of $version."
 				return zipFileOld
 			} else {
-			    // TODO stop tasks execution?
+				// TODO stop tasks execution?
 				println "FATAL ERROR: No old $description zip files found in $tmpDir."
 			}
 		}
