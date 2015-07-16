@@ -39,14 +39,14 @@ Add the following lines to the ```buildscript``` closure in your application's `
             jcenter()
         }
         dependencies {
-            classpath "com.siprell.plugins:bootstrap-framework-gradle:0.9.1"
+            classpath "com.siprell.plugins:bootstrap-framework:0.9.1"
         }
     }
 
 
 Add the following line to the root of your application's ```build.gradle```file.
 
-    apply plugin: "bootstrap-framework-gradle"
+    apply plugin: "bootstrap-framework"
         
 ### Configuration Options
 
@@ -256,7 +256,7 @@ Use the file below for customizing the Bootstrap Framework.
 
     /*
     * This file is for your Bootstrap Framework less and mixin customizations.
-    * It was created by the bootstrap-framework-gradle plugin.
+    * It was created by the bootstrap-framework plugin.
     * It will not be overwritten.
     *
     * You can import all less and mixin files as shown below,
@@ -275,7 +275,7 @@ Use the file below for customizing Font Awesome.
     * Font Awesome by Dave Gandy - http://fontawesome.io
     *
     * This file is for your Font Awesome less and mixin customizations.
-    * It was created by the bootstrap-framework-gradle plugin.
+    * It was created by the bootstrap-framework plugin.
     * It will not be overwritten.
     *
     * You can import all less and mixin files as shown below,

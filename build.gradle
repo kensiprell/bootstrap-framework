@@ -15,7 +15,7 @@ apply plugin: "groovy"
 apply plugin: "maven-publish"
 apply plugin: "maven"
 
-version "0.9.3-SNAPSHOT"
+version "0.9.3"
 group = "com.siprell.plugins"
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
@@ -38,11 +38,11 @@ dependencies {
 publishing {
 	publications {
 		maven(MavenPublication) {
-			artifactId "bootstrap-framework-gradle"
+			artifactId "bootstrap-framework"
 			pom.withXml {
 				asNode().children().last() + {
 					resolveStrategy = Closure.DELEGATE_FIRST
-					name "bootstrap-framework-gradle"
+					name "bootstrap-framework"
 					description "Gradle plugin for integrating the Bootstrap Framework."
 					url "https://github.com/kensiprell/bootstrap-framework-gradle"
 					scm {
@@ -90,7 +90,7 @@ bintray {
 	publications = ["maven"]
 	pkg {
 		repo = "gradle-plugins"
-		name = "bootstrap-framework-gradle"
+		name = "bootstrap-framework"
 		desc = "Gradle plugin for integrating the Bootstrap Framework"
 		websiteUrl = "https://github.com/kensiprell/bootstrap-framework-gradle"
 		issueTrackerUrl = "https://github.com/kensiprell/bootstrap-framework-gradle/issues"
