@@ -2,7 +2,7 @@
 
 [Bootstrap](http://getbootstrap.com) bills itself as "the most popular HTML, CSS, and JS framework for developing responsive, mobile first projects on the web."
 
-If you have a question, suggestion, or want to report a bug, please submit an [issue](https://github.com/kensiprell/bootstrap-framework-gradle/issues). I will reply as soon as I can.
+If you have a question, suggestion, or want to report a bug, please submit an [issue](https://github.com/kensiprell/bootstrap-framework/issues). I will reply as soon as I can.
 
 ### Highlights
 
@@ -18,7 +18,7 @@ This Grails [sample application](https://github.com/kensiprell/bootstrap-framewo
 
 ### Installation
 
-Add the following lines to the ```buildscript``` closure in your application's ```build.gradle``` file. The commented-out lines show the plugin default values, and if you are using Grails, they are not required for the plugin to work. See the [Configuration Options](https://github.com/kensiprell/bootstrap-framework-gradle#configuration-optinos) section for the details.
+Add the following lines to the ```buildscript``` closure in your application's ```build.gradle``` file. The commented-out lines show the plugin default values, and if you are using Grails, they are not required for the plugin to work. See the [Configuration Options](https://github.com/kensiprell/bootstrap-framework#configuration-optinos) section for the details.
 
     buildscript {
         ext {
@@ -261,7 +261,7 @@ Use the file below for customizing the Bootstrap Framework.
     *
     * You can import all less and mixin files as shown below,
     * or you can import them individually.
-    * See https://github.com/kensiprell/bootstrap-framework-gradle/blob/master/README.md#less
+    * See https://github.com/kensiprell/bootstrap-framework/blob/master/README.md#less
     */
 
     @import "bootstrap/less/bootstrap.less";
@@ -280,7 +280,7 @@ Use the file below for customizing Font Awesome.
     *
     * You can import all less and mixin files as shown below,
     * or you can import them individually.
-    * See https://github.com/kensiprell/bootstrap-framework-gradle/blob/master/README.md#font-awesome-less
+    * See https://github.com/kensiprell/bootstrap-framework/blob/master/README.md#font-awesome-less
     */
 
     @import "font-awesome/less/font-awesome.less";

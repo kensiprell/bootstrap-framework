@@ -44,11 +44,11 @@ publishing {
 					resolveStrategy = Closure.DELEGATE_FIRST
 					name "bootstrap-framework"
 					description "Gradle plugin for integrating the Bootstrap Framework."
-					url "https://github.com/kensiprell/bootstrap-framework-gradle"
+					url "https://github.com/kensiprell/bootstrap-framework"
 					scm {
-						url "https://github.com/kensiprell/bootstrap-framework-gradle"
-						connection "scm:https://github.com/kensiprell/bootstrap-framework-gradle.git"
-						developerConnection "scm:git://github.com/kensiprell/bootstrap-framework-gradle.git"
+						url "https://github.com/kensiprell/bootstrap-framework"
+						connection "scm:https://github.com/kensiprell/bootstrap-framework.git"
+						developerConnection "scm:git://github.com/kensiprell/bootstrap-framework.git"
 					}
 					licenses {
 						license {
@@ -92,9 +92,9 @@ bintray {
 		repo = "gradle-plugins"
 		name = "bootstrap-framework"
 		desc = "Gradle plugin for integrating the Bootstrap Framework"
-		websiteUrl = "https://github.com/kensiprell/bootstrap-framework-gradle"
-		issueTrackerUrl = "https://github.com/kensiprell/bootstrap-framework-gradle/issues"
-		vcsUrl = "https://github.com/kensiprell/bootstrap-framework-gradle.git"
+		websiteUrl = "https://github.com/kensiprell/bootstrap-framework"
+		issueTrackerUrl = "https://github.com/kensiprell/bootstrap-framework/issues"
+		vcsUrl = "https://github.com/kensiprell/bootstrap-framework.git"
 		licenses = ["Apache-2.0"]
 		labels = ["bootstrap", "fontawesome", "font-awesome", "gradle"]
 		publicDownloadNumbers = true
