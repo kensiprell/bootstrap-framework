@@ -13,12 +13,6 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 
 	void apply(Project project) {
 
-		/*
-		TODO
-		invalidVersionFails property
-		Test exception thrown (mrhaki.blogspot.de/2011/01/spocklight-check-for-exceptions-with.html)
-		*/
-
 		// Shared properties
 		def template = new Template()
 		def zipFile = new ZipFile()
@@ -172,7 +166,6 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 				from template.getFile(project, "createFontAwesomeCssAll")
 				rename ".*", "font-awesome-all.css"
 				into "${project.projectDir}/$cssPath"
-
 			}
 		}
 

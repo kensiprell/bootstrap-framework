@@ -27,12 +27,16 @@ class GradlePluginSpec extends Specification {
 	}
 
 	// TODO
+	//invalidVersionFails property
+	// exception thrown (mrhaki.blogspot.de/2011/01/spocklight-check-for-exceptions-with.html)
 	void "use invalid Bootstrap Framework version"() {
 		given:
 		true
 	}
 
 	// TODO
+	//invalidVersionFails property
+	// exception thrown (mrhaki.blogspot.de/2011/01/spocklight-check-for-exceptions-with.html)
 	void "use invalid Font Awesome version"() {
 		given:
 		true
