@@ -23,15 +23,17 @@ Add the following lines to the ```buildscript``` closure in your application's `
     buildscript {
         ext {
              //bootstrapFramework = [
-             //    version         : "3.3.5",
-             //    cssPath         : "grails-app/assets/stylesheets",
-             //    jsPath          : "grails-app/assets/javascripts",
-             //    useIndividualJs : false,
-             //    useLess         : false,
+             //    version             : "3.3.5",
+             //    cssPath             : "grails-app/assets/stylesheets",
+             //    jsPath              : "grails-app/assets/javascripts",
+             //    useIndividualJs     : false,
+             //    useLess             : false,
+             //    invalidVersionFails : false,
              //    fontAwesome : [
-             //       install : false
-             //       version : "4.3.0",
-             //       useLess : false
+             //       install             : false
+             //       version             : "4.3.0",
+             //       useLess             : false
+             //       invalidVersionFails : false
              //    ]
              //]
         }
@@ -81,6 +83,14 @@ If the property below is set to ```true```, the plugin will copy all individual 
 If the property below is set to ```true```, the plugin will copy all Bootstrap Framework LESS and mixin files to ```"${bootstrapFramework.cssPath}/bootstrap/less"```.
 
     useLess : true
+    
+#### invalidVersionFails
+
+The ```invalidVersionFails``` property can be configured individually for ```bootstrapFramework``` and ```bootstrapFramework.fontAwesome```. When the property is at its default of ```false``` and you have entered an invalid version number, the plugin will search the ```build/tmp``` directory for other versions of the appropriate zip file and use the one with the highest version number. This could be useful if you want the build to continue or you do not have an Internet connection. 
+
+Although the plugin will print a warning to the console, you might overlook it. You can disable this behavior by setting this property to ```true```. If the plugin cannot download the version you specified, it will throw an ```org.gradle.api.InvalidUserDataException```.
+
+    invalidVersionFails : true
 
 #### fontAwesome.install
 

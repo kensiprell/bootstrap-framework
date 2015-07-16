@@ -1,6 +1,7 @@
 package com.siprell.plugin.gradle.bootstrap
 
 import org.gradle.api.file.FileTree
+import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
@@ -16,7 +17,6 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 	    TODO
 	    invalidVersionFails property
 	    Add to README
-        Throw an exception
         Test in Spec
         */
 
@@ -33,6 +33,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		String jsPath = properties.jsPath ? properties.jsPath : "grails-app/assets/javascripts"
 		String cssPath = properties.cssPath ? properties.cssPath : "grails-app/assets/stylesheets"
 		boolean useAssetPipeline = jsPath.contains("assets")
+		boolean bootstrapInvalidVersionFails = properties.invalidVersionFails ?: false
 		FileTree bootstrapZipTree
 
 		// Font Awesome properties
@@ -40,6 +41,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		boolean fontAwesomeInstall = fontAwesome?.install ?: false
 		String fontAwesomeVersion = fontAwesome?.version ?: FA_DEFAULT_VERSION
 		boolean fontAwesomeUseLess = fontAwesome?.useLess ?: false
+		boolean fontAwesomeInvalidVersionFails = fontAwesome?.invalidVersionFails ?: false
 		FileTree fontAwesomeZipTree
 
 		project.afterEvaluate {
@@ -56,7 +58,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 			String filePrefix = "bootstrap-v"
 			String url = "https://github.com/twbs/bootstrap/archive/v${bootstrapVersion}.zip"
 			String zipFilename = "${filePrefix}${bootstrapVersion}.zip"
-			def zipFile = downloadZipFile.download(tmpDir, description, filePrefix, url, bootstrapVersion, zipFilename)
+			def zipFile = downloadZipFile.download(tmpDir, description, filePrefix, url, bootstrapVersion, zipFilename, bootstrapInvalidVersionFails)
 			bootstrapZipTree = (zipFile instanceof File) ? project.zipTree(zipFile) : null
 		}
 
@@ -66,7 +68,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 				String filePrefix = "fontAwesome-v"
 				String url = "http://fontawesome.io/assets/font-awesome-${fontAwesomeVersion}.zip"
 				String zipFilename = "${filePrefix}${fontAwesomeVersion}.zip"
-				def zipFile = downloadZipFile.download(tmpDir, description, filePrefix, url, fontAwesomeVersion, zipFilename)
+				def zipFile = downloadZipFile.download(tmpDir, description, filePrefix, url, fontAwesomeVersion, zipFilename, fontAwesomeInvalidVersionFails)
 				fontAwesomeZipTree = (zipFile instanceof File) ? project.zipTree(zipFile) : null
 			}
 		}
@@ -233,7 +235,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 class DownloadZipFile {
 	String fileSuffix = ".zip"
 
-	def download(String tmp, String description, String filePrefix, String url, String version, String zipFilename) {
+	def download(String tmp, String description, String filePrefix, String url, String version, String zipFilename, boolean invalidVersionFails) {
 		def tmpDir = new File("$tmp")
 		if (!tmpDir.exists()) {
 			tmpDir.mkdir()
@@ -249,7 +251,12 @@ class DownloadZipFile {
 			return zipFile
 		} catch (e) {
 			zipFile.delete()
-			println "Error: Could not download $url.\n$version is an invalid $description version, or you are not connected to the Internet."
+			def message = "Could not download $url.\n$version is an invalid $description version, or you are not connected to the Internet."
+			if (invalidVersionFails) {
+			    throw new InvalidUserDataException(message)
+			} else {
+			    println "Error: $message"
+			}
 			List<File> zipFiles = []
 			tmpDir.listFiles().each {
 				if (it.name.startsWith(filePrefix)) {
@@ -272,8 +279,7 @@ class DownloadZipFile {
 				println "Using $description version $newVersion instead of $version."
 				return zipFileOld
 			} else {
-				// TODO stop tasks execution?
-				println "FATAL ERROR: No old $description zip files found in $tmpDir."
+				throw new InvalidUserDataException("No old $description zip files found in $tmpDir.")
 			}
 		}
 	}
