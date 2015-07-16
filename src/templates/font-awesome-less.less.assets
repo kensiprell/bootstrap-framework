@@ -1,0 +1,19 @@
+/*
+* Font Awesome by Dave Gandy - http://fontawesome.io
+*
+* This file is for your Font Awesome less and mixin customizations.
+* It was created by the bootstrap-framework plugin.
+* It will not be overwritten.
+*
+* You can import all less and mixin files as shown below,
+* or you can import them individually.
+* See https://github.com/kensiprell/bootstrap-framework/blob/master/README.md#font-awesome-less
+*/
+
+@import "font-awesome/less/font-awesome.less";
+
+@fa-font-path: "/assets/font-awesome/fonts";
+
+/*
+* Your customizations go below this section.
+*/
