@@ -12,18 +12,17 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 	final FA_DEFAULT_VERSION = "4.3.0"
 
 	void apply(Project project) {
-	    
-	    /*
-	    TODO
-	    invalidVersionFails property
-	    Add to README
-        Test in Spec
-        */
+
+		/*
+		TODO
+		invalidVersionFails property
+		Test exception thrown (mrhaki.blogspot.de/2011/01/spocklight-check-for-exceptions-with.html)
+		*/
 
 		// Shared properties
-		def downloadZipFile = new DownloadZipFile()
+		def template = new Template()
+		def zipFile = new ZipFile()
 		def properties = project.hasProperty("bootstrapFramework") ? project.bootstrapFramework : [:]
-		String templatesDir = "${project.projectDir}/src/templates"
 		String tmpDir = "${project.buildDir}/tmp"
 
 		// Bootstrap Framework properties
@@ -58,8 +57,8 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 			String filePrefix = "bootstrap-v"
 			String url = "https://github.com/twbs/bootstrap/archive/v${bootstrapVersion}.zip"
 			String zipFilename = "${filePrefix}${bootstrapVersion}.zip"
-			def zipFile = downloadZipFile.download(tmpDir, description, filePrefix, url, bootstrapVersion, zipFilename, bootstrapInvalidVersionFails)
-			bootstrapZipTree = (zipFile instanceof File) ? project.zipTree(zipFile) : null
+			def file = zipFile.download(tmpDir, description, filePrefix, url, bootstrapVersion, zipFilename, bootstrapInvalidVersionFails)
+			bootstrapZipTree = (file instanceof File) ? project.zipTree(file) : null
 		}
 
 		project.task("downloadFontAwesomeZip", dependsOn: project.tasks.downloadBootstrapZip) {
@@ -68,15 +67,16 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 				String filePrefix = "fontAwesome-v"
 				String url = "http://fontawesome.io/assets/font-awesome-${fontAwesomeVersion}.zip"
 				String zipFilename = "${filePrefix}${fontAwesomeVersion}.zip"
-				def zipFile = downloadZipFile.download(tmpDir, description, filePrefix, url, fontAwesomeVersion, zipFilename, fontAwesomeInvalidVersionFails)
-				fontAwesomeZipTree = (zipFile instanceof File) ? project.zipTree(zipFile) : null
+				def file = zipFile.download(tmpDir, description, filePrefix, url, fontAwesomeVersion, zipFilename, fontAwesomeInvalidVersionFails)
+				fontAwesomeZipTree = (file instanceof File) ? project.zipTree(file) : null
 			}
 		}
 
 		project.task("createBootstrapJsAll", type: Copy, dependsOn: project.tasks.downloadFontAwesomeZip) {
 			if (useAssetPipeline) {
-			    from "$templatesDir/bootstrap-all.js"
-			    into "${project.projectDir}/$jsPath"
+				from template.getFile(project, "createBootstrapJsAll")
+				rename ".*", "bootstrap-all.js"
+				into "${project.projectDir}/$jsPath"
 			}
 		}
 
@@ -97,8 +97,9 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 
 		project.task("createBootstrapCssAll", type: Copy, dependsOn: project.tasks.createBootstrapJs) {
 			if (useAssetPipeline) {
-			    from "$templatesDir/bootstrap-all.css"
-			    into "${project.projectDir}/$cssPath"
+				from template.getFile(project, "createBootstrapCssAll")
+				rename ".*", "bootstrap-all.css"
+				into "${project.projectDir}/$cssPath"
 			}
 		}
 
@@ -129,8 +130,9 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 
 		project.task("createBootstrapLessAll", type: Copy, dependsOn: project.tasks.createBootstrapCssIndividual) {
 			if (useLess && useAssetPipeline) {
-			    from "$templatesDir/bootstrap-less.less"
-			    into "${project.projectDir}/$cssPath"
+				from template.getFile(project, "createBootstrapLessAll")
+				rename ".*", "bootstrap-less.less"
+				into "${project.projectDir}/$cssPath"
 			}
 		}
 
@@ -138,9 +140,9 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 			def path = "${project.projectDir}/$cssPath/bootstrap/less"
 			def files = []
 			if (useLess) {
-			    files = bootstrapZipTree.matching {
-				    include "*/less/*.less"
-			    }.collect()
+				files = bootstrapZipTree.matching {
+					include "*/less/*.less"
+				}.collect()
 			}
 			from files
 			into path
@@ -153,13 +155,13 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 				project.mkdir(path)
 			}
 			if (!useLess && project.file(lessPath).exists()) {
-			    project.file(lessPath).delete()
+				project.file(lessPath).delete()
 			}
 			def files = []
 			if (useLess) {
-			    files = bootstrapZipTree.matching {
-				    include "*/less/mixins/*.less"
-		    	}.collect()
+				files = bootstrapZipTree.matching {
+					include "*/less/mixins/*.less"
+				}.collect()
 			}
 			from files
 			into path
@@ -167,8 +169,10 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 
 		project.task("createFontAwesomeCssAll", type: Copy, dependsOn: project.tasks.createBootstrapMixins) {
 			if (fontAwesomeInstall && useAssetPipeline) {
-			    from "$templatesDir/font-awesome-all.css"
-			    into "${project.projectDir}/$cssPath"
+				from template.getFile(project, "createFontAwesomeCssAll")
+				rename ".*", "font-awesome-all.css"
+				into "${project.projectDir}/$cssPath"
+
 			}
 		}
 
@@ -204,17 +208,14 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 
 		project.task("createFontAwesomeLessAll", type: Copy, dependsOn: project.tasks.createFontAwesomeFonts) {
 			if (fontAwesomeInstall && fontAwesomeUseLess) {
-			    def target = "font-awesome-less.less"
-			    if (cssPath.contains("assets")) {
-			        def source = "font-awesome-less.less.assets"
-			        from "$templatesDir/$source"
-		            rename { String fileName ->
-                        fileName.replace(source, target)
-                    }
-			    } else {
-			        from "$templatesDir/$target"
-			    }
-			    into "${project.projectDir}/$cssPath"
+				def target = "font-awesome-less.less"
+				if (cssPath.contains("assets")) {
+					from template.getFile(project, "createFontAwesomeLessAllAssets")
+				} else {
+					from template.getFile(project, "createFontAwesomeLessAll")
+				}
+				rename ".*", "font-awesome-less.less"
+				into "${project.projectDir}/$cssPath"
 			}
 		}
 
@@ -232,7 +233,111 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 	}
 }
 
-class DownloadZipFile {
+class Template {
+	static getText(String template) {
+		def text = ""
+		switch (template) {
+			case "createBootstrapJsAll":
+				text = """/*
+* Do not edit this file. It will be overwritten by the bootstrap-framework plugin.
+*
+*= require bootstrap/css/bootstrap.css
+*= require bootstrap/css/bootstrap-theme.css
+*/
+"""
+				break
+			case "createBootstrapCssAll":
+				text = """/*
+* Do not edit this file. It will be overwritten by the bootstrap-framework plugin.
+*
+*= require bootstrap/css/bootstrap.css
+*= require bootstrap/css/bootstrap-theme.css
+*/
+"""
+				break
+			case "createBootstrapLessAll":
+				text = """/*
+* This file is for your Bootstrap Framework less and mixin customizations.
+* It was created by the bootstrap-framework plugin.
+* It will not be overwritten.
+*
+* You can import all less and mixin files as shown below,
+* or you can import them individually.
+* See https://github.com/kensiprell/bootstrap-framework/blob/master/README.md#less
+*/
+
+@import "bootstrap/less/bootstrap.less";
+
+/*
+* Your customizations go below this section.
+*/
+"""
+				break
+			case "createFontAwesomeCssAll":
+				text = """/*
+* Font Awesome by Dave Gandy - http://fontawesome.io
+*
+* Do not edit this file. It will be overwritten by the bootstrap-framework plugin.
+*
+*= require font-awesome/css/font-awesome.css
+*= require_tree font-awesome/fonts
+*/
+"""
+				break
+			case "createFontAwesomeLessAllAssets":
+				text = """/*
+* Font Awesome by Dave Gandy - http://fontawesome.io
+*
+* This file is for your Font Awesome less and mixin customizations.
+* It was created by the bootstrap-framework plugin.
+* It will not be overwritten.
+*
+* You can import all less and mixin files as shown below,
+* or you can import them individually.
+* See https://github.com/kensiprell/bootstrap-framework/blob/master/README.md#font-awesome-less
+*/
+
+@import "font-awesome/less/font-awesome.less";
+
+@fa-font-path: "/assets/font-awesome/fonts";
+
+/*
+* Your customizations go below this section.
+*/
+"""
+				break
+			case "createFontAwesomeLessAll":
+				text = """/*
+* Font Awesome by Dave Gandy - http://fontawesome.io
+*
+* This file is for your Font Awesome less and mixin customizations.
+* It was created by the bootstrap-framework plugin.
+* It will not be overwritten.
+*
+* You can import all less and mixin files as shown below,
+* or you can import them individually.
+* See https://github.com/kensiprell/bootstrap-framework/blob/master/README.md#font-awesome-less
+*/
+
+@import "font-awesome/less/font-awesome.less";
+
+@fa-font-path: "/font-awesome/fonts";
+
+/*
+* Your customizations go below this section.
+*/
+"""
+				break
+		}
+		text.toString()
+	}
+
+	static getFile(Project project, String template) {
+		project.resources.text.fromString(getText(template)).asFile()
+	}
+}
+
+class ZipFile {
 	String fileSuffix = ".zip"
 
 	def download(String tmp, String description, String filePrefix, String url, String version, String zipFilename, boolean invalidVersionFails) {
@@ -253,9 +358,9 @@ class DownloadZipFile {
 			zipFile.delete()
 			def message = "Could not download $url.\n$version is an invalid $description version, or you are not connected to the Internet."
 			if (invalidVersionFails) {
-			    throw new InvalidUserDataException(message)
+				throw new InvalidUserDataException(message)
 			} else {
-			    println "Error: $message"
+				println "Error: $message"
 			}
 			List<File> zipFiles = []
 			tmpDir.listFiles().each {
