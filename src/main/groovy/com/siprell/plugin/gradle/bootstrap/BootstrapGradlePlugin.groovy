@@ -68,7 +68,6 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 			if (fontAwesomeInstall) {
 				String description = "Font Awesome"
 				String filePrefix = "fontAwesome-v"
-				//String url = "http://fontawesome.io/assets/font-awesome-${fontAwesomeVersion}.zip"
 				String url = "https://github.com/FortAwesome/Font-Awesome/archive/v${fontAwesomeVersion}.zip"
 				String zipFilename = "${filePrefix}${fontAwesomeVersion}.zip"
 				def file = zipFile.download(tmpDir, description, filePrefix, url, fontAwesomeVersion, zipFilename, fontAwesomeInvalidVersionFails)
@@ -171,7 +170,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 				project.mkdir(path)
 			}
 			if (!useLess && project.file(lessPath).exists()) {
-				project.file(lessPath).delete()
+				project.delete(lessPath)
 			}
 			def files = []
 			if (useLess) {
