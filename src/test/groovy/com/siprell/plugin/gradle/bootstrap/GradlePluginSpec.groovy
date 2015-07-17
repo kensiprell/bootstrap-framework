@@ -4,27 +4,38 @@ import java.text.SimpleDateFormat
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import spock.lang.Specification
+import spock.lang.Stepwise
 
+@Stepwise
 class GradlePluginSpec extends Specification {
+    
+	static cssPath = "src/main/webapp/css"
+    static jsPath = "src/main/webapp/js"
+	static grailsCssPath = "grails-app/assets/stylesheets"
+    static grailsJsPath = "grails-app/assets/javascripts"
+	static boolean useAssetPipeline = true
 
-	static final bootstrapDefaultVersion = "3.3.5"
-	static final bootstrapTestVersion = "3.3.4"
-	static final fontAwesomeDefaultVersion = "4.3.0"
-	static final fontAwesomeTestVersion = "4.2.0"
-	static final grailsJsPath = "grails-app/assets/javascripts"
-	static final grailsCssPath = "grails-app/assets/stylesheets"
-	static final jsPath = "src/main/webapp/resources/js"
-	static final cssPath = "src/main/webapp/resources/css"
-	static boolean useAssetPipeline
-
+	def setupSpec() {
+	    deleteDirs()
+    	[
+    	    "$filePath.root/$cssPath",
+            "$filePath.root/$jsPath",
+    	    "$filePath.root/$grailsCssPath",
+            "$filePath.root/$grailsJsPath"
+        ].each {
+            new File("$it").mkdirs()
+        }
+	}
+	
 	def setup() {
-		useAssetPipeline = true
-		deleteTestFiles()
+	    useAssetPipeline = true
 	}
-
+	
 	def cleanupSpec() {
-		deleteTestFiles()
+	    deleteDirs()
 	}
+	
+	// TODO test missing directory exceptions
 
 	// TODO
 	//invalidVersionFails property
@@ -42,34 +53,53 @@ class GradlePluginSpec extends Specification {
 		true
 	}
 
-	// TODO
-	void "change Font Awesome version to #fontAwesomeTestVersion"() {
-		given:
-		true
-	}
-
-	void "change Bootstrap Framework version to #bootstrapTestVersion"() {
-		given:
-		createProject(false, false, false, false, false, false)
+	void "change Bootstrap Framework version to #testVersion"() {
+		when:
+		def testVersion = "3.3.4"
+		def properties = [
+		version				: testVersion,
+		cssPath				: grailsCssPath,
+		jsPath				: grailsJsPath,
+		useIndividualJs		: false,
+		useLess				: false,
+		invalidVersionFails	: false,
+		fontAwesome : [
+			install				: false,
+			version				: "4.3.0",
+			useLess				: false,
+			invalidVersionFails	: false
+			]
+		]
+		createProject(properties)
 		def prefix = "* Bootstrap v"
 		def suffix = " (http://getbootstrap.com)"
-
-		when:
 		def cssFile = new File("$filePath.css/bootstrap.css")
 		def jsFile = new File("$filePath.js/bootstrap.js")
 		def cssFileVersion = cssFile.readLines().get(1).trim() - prefix - suffix
 		def jsFilesVersion = jsFile.readLines().get(1).trim() - prefix - suffix
 
 		then:
-		bootstrapTestVersion == cssFileVersion
-		bootstrapTestVersion == jsFilesVersion
+		testVersion == cssFileVersion
+		testVersion == jsFilesVersion
 	}
 
 	void "apply plugin using default settings"() {
-		given:
-		createProject(true, false, false, false, false, false)
-
 		when:
+		def properties = [
+		version				: "3.3.5",
+		cssPath				: grailsCssPath,
+		jsPath				: grailsJsPath,
+		useIndividualJs		: false,
+		useLess				: false,
+		invalidVersionFails	: false,
+		fontAwesome : [
+			install				: false,
+			version				: "4.3.0",
+			useLess				: false,
+			invalidVersionFails	: false
+			]
+		]
+		createProject(properties)
 		def data = currentData
 
 		then:
@@ -104,11 +134,23 @@ class GradlePluginSpec extends Specification {
 	}
 
 	void "apply plugin without asset-pipeline"() {
-		given:
-		useAssetPipeline = false
-		createProject(true, false, false, false, false, false)
-
 		when:
+		def properties = [
+		version				: "3.3.5",
+		cssPath				: cssPath,
+		jsPath				: jsPath,
+		useIndividualJs		: false,
+		useLess				: false,
+		invalidVersionFails	: false,
+		fontAwesome : [
+			install				: false,
+			version				: "4.3.0",
+			useLess				: false,
+			invalidVersionFails	: false
+			]
+		]
+		createProject(properties)
+		useAssetPipeline = false
 		def data = currentData
 
 		then:
@@ -143,10 +185,22 @@ class GradlePluginSpec extends Specification {
 	}
 
 	void "apply plugin using Bootstrap Framework individual JavaScript files"() {
-		given:
-		createProject(true, true, false, false, false, false)
-
 		when:
+		def properties = [
+		version				: "3.3.5",
+		cssPath				: grailsCssPath,
+		jsPath				: grailsJsPath,
+		useIndividualJs		: true,
+		useLess				: false,
+		invalidVersionFails	: false,
+		fontAwesome : [
+			install				: false,
+			version				: "4.3.0",
+			useLess				: false,
+			invalidVersionFails	: false
+			]
+		]
+		createProject(properties)
 		def data = currentData
 
 		then:
@@ -181,10 +235,22 @@ class GradlePluginSpec extends Specification {
 	}
 
 	void "apply plugin using Bootstrap Framework LESS support"() {
-		given:
-		createProject(true, false, true, false, false, false)
-
 		when:
+		def properties = [
+		version				: "3.3.5",
+		cssPath				: grailsCssPath,
+		jsPath				: grailsJsPath,
+		useIndividualJs		: false,
+		useLess				: true,
+		invalidVersionFails	: false,
+		fontAwesome : [
+			install				: false,
+			version				: "4.3.0",
+			useLess				: false,
+			invalidVersionFails	: false
+			]
+		]
+		createProject(properties)
 		def data = currentData
 
 		then:
@@ -219,10 +285,22 @@ class GradlePluginSpec extends Specification {
 	}
 
 	void "apply plugin using Bootstrap Framework version LESS support and individual JavaScript files"() {
-		given:
-		createProject(true, true, true, false, false, false)
-
 		when:
+		def properties = [
+		version				: "3.3.5",
+		cssPath				: grailsCssPath,
+		jsPath				: grailsJsPath,
+		useIndividualJs		: true,
+		useLess				: true,
+		invalidVersionFails	: false,
+		fontAwesome : [
+			install				: false,
+			version				: "4.3.0",
+			useLess				: false,
+			invalidVersionFails	: false
+			]
+		]
+		createProject(properties)
 		def data = currentData
 
 		then:
@@ -256,11 +334,50 @@ class GradlePluginSpec extends Specification {
 		data.fontAwesomeLessCount == 0
 	}
 
-	void "apply plugin using default Bootstrap Framework and Font Awesome settings"() {
-		given:
-		createProject(true, false, false, true, true, false)
-
+	void "change Font Awesome version to #testVersion"() {
 		when:
+		def testVersion = "4.2.0"
+		def properties = [
+		version				: "3.3.5",
+		cssPath				: grailsCssPath,
+		jsPath				: grailsJsPath,
+		useIndividualJs		: false,
+		useLess				: false,
+		invalidVersionFails	: false,
+		fontAwesome : [
+			install				: true,
+			version				: testVersion,
+			useLess				: false,
+			invalidVersionFails	: false
+			]
+		]
+		createProject(properties)
+		def prefix = "*  Font Awesome "
+		def suffix = " by @davegandy - http://fontawesome.io - @fontawesome"
+		def cssFile = new File("$filePath.faCss/font-awesome.css")
+		def cssFileVersion = cssFile.readLines().get(1).trim() - prefix - suffix
+
+		then:
+		testVersion == cssFileVersion
+	}
+
+	void "apply plugin using default Bootstrap Framework and Font Awesome settings"() {
+		when:
+		def properties = [
+		version				: "3.3.5",
+		cssPath				: grailsCssPath,
+		jsPath				: grailsJsPath,
+		useIndividualJs		: false,
+		useLess				: false,
+		invalidVersionFails	: false,
+		fontAwesome : [
+			install				: true,
+			version				: "4.3.0",
+			useLess				: false,
+			invalidVersionFails	: false
+			]
+		]
+		createProject(properties)
 		def data = currentData
 
 		then:
@@ -269,8 +386,8 @@ class GradlePluginSpec extends Specification {
 		data.bootstrapJs.exists()
 		data.jsCount == 1
 		data.bootstrapAllCss.exists()
-		!data.bootstrapLessLess.exists()
-		data.stylesheetsCount == 4
+		data.bootstrapLessLess.exists()
+		data.stylesheetsCount == 5
 		data.stylesheetsBootstrapCount == 2
 		data.bootstrapCss.exists()
 		data.bootstrapThemeCss.exists()
@@ -285,8 +402,7 @@ class GradlePluginSpec extends Specification {
 		!data.mixins.exists()
 		data.mixinsCount == 0
 		data.fontAwesomeAllCss.exists()
-		!data.fontAwesomeLessLess.exists()
-		data.stylesheetsFontAwesomeCount == 2
+		!data.fontAwesomeLessLess.exists() 
 		data.fontAwesomeCss.exists()
 		data.fontAwesomeFonts.exists()
 		data.fontAwesomeFontsCount == 6
@@ -295,10 +411,22 @@ class GradlePluginSpec extends Specification {
 	}
 
 	void "apply plugin using Bootstrap Framework default settings and Font Awesome with LESS support"() {
-		given:
-		createProject(true, false, false, true, true, true)
-
 		when:
+		def properties = [
+		version				: "3.3.5",
+		cssPath				: grailsCssPath,
+		jsPath				: grailsJsPath,
+		useIndividualJs		: false,
+		useLess				: false,
+		invalidVersionFails	: false,
+		fontAwesome : [
+			install				: true,
+			version				: "4.3.0",
+			useLess				: true,
+			invalidVersionFails	: false
+			]
+		]
+		createProject(properties)
 		def data = currentData
 
 		then:
@@ -307,8 +435,8 @@ class GradlePluginSpec extends Specification {
 		data.bootstrapJs.exists()
 		data.jsCount == 1
 		data.bootstrapAllCss.exists()
-		!data.bootstrapLessLess.exists()
-		data.stylesheetsCount == 5
+		data.bootstrapLessLess.exists()
+		data.stylesheetsCount == 6
 		data.stylesheetsBootstrapCount == 2
 		data.bootstrapCss.exists()
 		data.bootstrapThemeCss.exists()
@@ -332,45 +460,15 @@ class GradlePluginSpec extends Specification {
 		data.fontAwesomeLessCount == 13
 	}
 
-	static deleteTestFiles() {
+	def deleteDirs() {
 		new File("$filePath.root/grails-app").deleteDir()
 		new File("$filePath.root/src/main/webapp").deleteDir()
 	}
-
-	static createProject(
-		boolean defaultVersion,
-		boolean useIndividualJs,
-		boolean useLess,
-		boolean useFontAwesome,
-		boolean useFontAwesomeDefaultVersion,
-		boolean useFontAwesomeLess
-	) {
+	
+	static createProject(properties) {
 		Project project = ProjectBuilder.builder().withProjectDir(new File(filePath.root)).build()
-		String version = defaultVersion ? bootstrapDefaultVersion : bootstrapTestVersion
-		String faVersion = useFontAwesomeDefaultVersion ? fontAwesomeDefaultVersion : fontAwesomeTestVersion
-		if (useFontAwesome) {
-			project.ext.bootstrapFramework = [
-				version        : version,
-				cssPath        : filePath.stylesheets,
-				jsPath         : filePath.javascripts,
-				useIndividualJs: useIndividualJs,
-				useLess        : useLess,
-				fontAwesome    : [
-					install: true,
-					version: faVersion,
-					useLess: useFontAwesomeLess
-				]
-			]
-		} else {
-			project.ext.bootstrapFramework = [
-				version        : version,
-				cssPath        : filePath.stylesheets,
-				jsPath         : filePath.javascripts,
-				useIndividualJs: useIndividualJs,
-				useLess        : useLess
-			]
-		}
-		project.pluginManager.apply "bootstrap-framework-gradle"
+		project.ext.bootstrapFramework = properties
+		project.pluginManager.apply "bootstrap-framework"
 		project.tasks["downloadBootstrapZip"].execute()
 		project.tasks["downloadFontAwesomeZip"].execute()
 		project.tasks["createBootstrapJsAll"].execute()
@@ -378,14 +476,14 @@ class GradlePluginSpec extends Specification {
 		project.tasks["createBootstrapCssAll"].execute()
 		project.tasks["createBootstrapFonts"].execute()
 		project.tasks["createBootstrapCssIndividual"].execute()
-		project.tasks["createBootstrapLessAll"].execute()
+		project.tasks["createBootstrapLessLess"].execute()
 		project.tasks["createBootstrapLess"].execute()
 		project.tasks["createBootstrapMixins"].execute()
 		project.tasks["downloadFontAwesomeZip"].execute()
 		project.tasks["createFontAwesomeCssAll"].execute()
 		project.tasks["createFontAwesomeCssIndividual"].execute()
 		project.tasks["createFontAwesomeFonts"].execute()
-		project.tasks["createFontAwesomeLessAll"].execute()
+		project.tasks["createFontAwesomeLessLess"].execute()
 		project.tasks["createFontAwesomeLess"].execute()
 	}
 
@@ -401,7 +499,6 @@ class GradlePluginSpec extends Specification {
 		String faCss = "$stylesheets/font-awesome/css"
 		String faFonts = "$stylesheets/font-awesome/fonts"
 		String faLess = "$stylesheets/font-awesome/less"
-
 		[
 			root       : root,
 			javascripts: javascripts,
@@ -448,7 +545,6 @@ class GradlePluginSpec extends Specification {
 		def fontAwesomeFontsCount = fontAwesomeFonts.exists() ? fontAwesomeFonts.listFiles().size() : 0
 		def fontAwesomeLess = new File(filePath.faLess)
 		def fontAwesomeLessCount = fontAwesomeLess.exists() ? fontAwesomeLess.listFiles().size() : 0
-
 		[
 			bootstrapAllJs             : bootstrapAllJs,
 			javascriptsCount           : javascriptsCount,
