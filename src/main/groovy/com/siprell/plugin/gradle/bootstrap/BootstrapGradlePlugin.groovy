@@ -45,14 +45,14 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 			println "$BOOTSTRAP_DEFAULT_VERSION is the default Bootstrap Framework version."
 			println "$FA_DEFAULT_VERSION is the default Font Awesome version."
 		}
-		
+
 		project.task("checkDirectories") {
-		    if (!project.file(cssPath).exists()) {
-		        throw new InvalidUserDataException("bootstrapFramework.cssPath directory ($cssPath) does not exist.")
-		    }
-		    if (!project.file(jsPath).exists()) {
-		        throw new InvalidUserDataException("bootstrapFramework.jsPath directory (jsPath) does not exist.")
-		    }
+			if (!project.file(cssPath).exists()) {
+				throw new InvalidUserDataException("bootstrapFramework.cssPath directory ($cssPath) does not exist.")
+			}
+			if (!project.file(jsPath).exists()) {
+				throw new InvalidUserDataException("bootstrapFramework.jsPath directory (jsPath) does not exist.")
+			}
 		}
 
 		project.task("downloadBootstrapZip") {
@@ -76,14 +76,14 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		}
 
 		project.task("createBootstrapJsAll", type: Copy, dependsOn: project.tasks.downloadFontAwesomeZip) {
-		    def path = "${project.projectDir}/$jsPath"
-		    def filename = "bootstrap-all.js"
+			def path = "${project.projectDir}/$jsPath"
+			def filename = "bootstrap-all.js"
 			if (useAssetPipeline) {
 				from template.getFile(project, "createBootstrapJsAll")
 				rename ".*", filename
 				into path
 			} else {
-			    project.delete("$path/$filename")
+				project.delete("$path/$filename")
 			}
 		}
 
@@ -103,14 +103,14 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		}
 
 		project.task("createBootstrapCssAll", type: Copy, dependsOn: project.tasks.createBootstrapJs) {
-		    def path = "${project.projectDir}/$cssPath"
-		    def filename = "bootstrap-all.css"
+			def path = "${project.projectDir}/$cssPath"
+			def filename = "bootstrap-all.css"
 			if (useAssetPipeline) {
 				from template.getFile(project, "createBootstrapCssAll")
 				rename ".*", filename
 				into path
 			} else {
-			    project.delete("$path/$filename")
+				project.delete("$path/$filename")
 			}
 		}
 
@@ -140,12 +140,12 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		}
 
 		project.task("createBootstrapLessLess", type: Copy, dependsOn: project.tasks.createBootstrapCssIndividual) {
-		    def path = "${project.projectDir}/$cssPath"
-		    def filename = "bootstrap-less.less"
+			def path = "${project.projectDir}/$cssPath"
+			def filename = "bootstrap-less.less"
 			if (useLess && useAssetPipeline) {
-    			from template.getFile(project, "createBootstrapLessLess")
-    			rename ".*", filename
-    			into path
+				from template.getFile(project, "createBootstrapLessLess")
+				rename ".*", filename
+				into path
 			}
 		}
 
@@ -156,10 +156,10 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 				files = bootstrapZipTree.matching {
 					include "*/less/*.less"
 				}.collect()
-    			from files
-    			into path
+				from files
+				into path
 			} else {
-			    project.delete(path)
+				project.delete(path)
 			}
 		}
 
@@ -183,14 +183,14 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		}
 
 		project.task("createFontAwesomeCssAll", type: Copy, dependsOn: project.tasks.createBootstrapMixins) {
-		    def path = "${project.projectDir}/$cssPath"
-		    def filename = "font-awesome-all.css"
+			def path = "${project.projectDir}/$cssPath"
+			def filename = "font-awesome-all.css"
 			if (fontAwesomeInstall && useAssetPipeline) {
 				from template.getFile(project, "createFontAwesomeCssAll")
 				rename ".*", filename
 				into path
 			} else {
-			    project.delete("$path/$filename")
+				project.delete("$path/$filename")
 			}
 		}
 
@@ -219,10 +219,10 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 				files = fontAwesomeZipTree.matching {
 					include "*/fonts/*"
 				}.collect()
-    			from files
-    			into path
+				from files
+				into path
 			} else {
-			    project.delete("${project.projectDir}/$cssPath/font-awesome")
+				project.delete("${project.projectDir}/$cssPath/font-awesome")
 			}
 		}
 
@@ -246,10 +246,10 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 				files = fontAwesomeZipTree.matching {
 					include "*/less/*.less"
 				}.collect()
-    			from files
-    			into path
+				from files
+				into path
 			} else {
-			    project.delete(path)
+				project.delete(path)
 			}
 		}
 	}
@@ -364,7 +364,7 @@ class ZipFile {
 
 	def download(String tmp, String description, String filePrefix, String url, String version, String zipFilename, boolean invalidVersionFails) {
 		def message = "Could not download $url.\n$version is an invalid $description version, or you are not connected to the Internet."
-		def connection = new URL(url).openConnection()
+		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection()
 		def tmpDir = new File("$tmp")
 		if (!tmpDir.exists()) {
 			tmpDir.mkdir()
@@ -394,30 +394,30 @@ class ZipFile {
 			} else {
 				println "Error: $message"
 			}
-			List<File> zipFiles = []
-			tmpDir.listFiles().each {
-				if (it.name.startsWith(filePrefix)) {
-					zipFiles << it
-				}
+		}
+		List<File> zipFiles = []
+		tmpDir.listFiles().each {
+			if (it.name.startsWith(filePrefix)) {
+				zipFiles << it
 			}
-			if (zipFiles.size() > 0) {
-				File zipFileOld
-				if (zipFiles.size() == 1) {
-					zipFileOld = zipFiles[0]
-				} else {
-					zipFileOld = zipFiles.sort(false) { a, b ->
-						def tokens = [a.name.minus(filePrefix).minus(fileSuffix), b.name.minus(filePrefix).minus(fileSuffix)]
-						tokens*.tokenize('.')*.collect { it as int }.with { u, v ->
-							[u, v].transpose().findResult { x, y -> x <=> y ?: null } ?: u.size() <=> v.size()
-						}
-					}[-1]
-				}
-				String newVersion = zipFileOld.name.minus(filePrefix).minus(fileSuffix)
-				println "Using $description version $newVersion instead of $version."
-				return zipFileOld
+		}
+		if (zipFiles.size() > 0) {
+			File zipFileOld
+			if (zipFiles.size() == 1) {
+				zipFileOld = zipFiles[0]
 			} else {
-				throw new InvalidUserDataException("No old $description zip files found in $tmpDir.")
+				zipFileOld = zipFiles.sort(false) { a, b ->
+					def tokens = [a.name.minus(filePrefix).minus(fileSuffix), b.name.minus(filePrefix).minus(fileSuffix)]
+					tokens*.tokenize('.')*.collect { it as int }.with { u, v ->
+						[u, v].transpose().findResult { x, y -> x <=> y ?: null } ?: u.size() <=> v.size()
+					}
+				}[-1]
 			}
+			String newVersion = zipFileOld.name.minus(filePrefix).minus(fileSuffix)
+			println "Using $description version $newVersion instead of $version."
+			return zipFileOld
+		} else {
+			throw new InvalidUserDataException("No old $description zip files found in $tmpDir.")
 		}
 	}
 }
