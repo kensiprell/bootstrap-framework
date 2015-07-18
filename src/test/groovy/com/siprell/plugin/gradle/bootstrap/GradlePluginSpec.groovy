@@ -11,8 +11,6 @@ import spock.lang.Specification
 
 class GradlePluginSpec extends Specification {
 
-	// TODO add version checks to "invalidVersionFails = false and zip files are available" tests
-
 	@Rule
 	OutputCapture capture = new OutputCapture()
 
@@ -207,13 +205,21 @@ class GradlePluginSpec extends Specification {
 	void "use invalid Bootstrap Framework version with invalidVersionFails = false and zip files are available"() {
 		given:
 		def version = "3.2.99"
+		def prefix = "* Bootstrap v"
+		def suffix = " (http://getbootstrap.com)"
 
 		when:
 		def properties = defaultProperties
 		properties.version = version
 		createProject(properties)
+		def cssFile = new File("$filePath.css/bootstrap.css")
+		def jsFile = new File("$filePath.js/bootstrap.js")
+		def cssFileVersion = cssFile.readLines().get(1).trim() - prefix - suffix
+		def jsFilesVersion = jsFile.readLines().get(1).trim() - prefix - suffix
 
 		then:
+		bootstrapDefaultVersion == cssFileVersion
+		bootstrapDefaultVersion == jsFilesVersion
 		final List<String> lines = capture.toString().tokenize(System.properties["line.separator"])
 		lines[0] == "Error: Could not download https://github.com/twbs/bootstrap/archive/v${version}.zip.".toString()
 		lines[1] == "${version} is an invalid Bootstrap Framework version, or you are not connected to the Internet.".toString()
@@ -475,14 +481,19 @@ class GradlePluginSpec extends Specification {
 	void "use invalid Font Awesome version with invalidVersionFails = false and zip files are available"() {
 		given:
 		def version = "3.2.99"
+		def prefix = "*  Font Awesome "
+		def suffix = " by @davegandy - http://fontawesome.io - @fontawesome"
 
 		when:
 		def properties = defaultProperties
 		properties.fontAwesome.install = true
 		properties.fontAwesome.version = version
 		createProject(properties)
+		def cssFile = new File("$filePath.faCss/font-awesome.css")
+		def cssFileVersion = cssFile.readLines().get(1).trim() - prefix - suffix
 
 		then:
+		fontAwesomeDefaultVersion == cssFileVersion
 		final List<String> lines = capture.toString().tokenize(System.properties["line.separator"])
 		lines[0] == "Error: Could not download https://github.com/FortAwesome/Font-Awesome/archive/v${version}.zip.".toString()
 		lines[1] == "${version} is an invalid Font Awesome version, or you are not connected to the Internet.".toString()
