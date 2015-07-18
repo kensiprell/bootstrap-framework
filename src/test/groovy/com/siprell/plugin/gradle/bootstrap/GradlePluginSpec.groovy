@@ -11,6 +11,8 @@ import spock.lang.Specification
 
 class GradlePluginSpec extends Specification {
 
+	// TODO add version checks to "invalidVersionFails = false and zip files are available" tests
+
 	@Rule
 	OutputCapture capture = new OutputCapture()
 
@@ -76,8 +78,8 @@ class GradlePluginSpec extends Specification {
 
 		then:
 		final List<String> lines = capture.toString().tokenize(System.properties["line.separator"])
-		lines[0].trim() == "Error: Could not download https://github.com/twbs/bootstrap/archive/v${version}.zip.".toString()
-		lines[1].trim() == "${version} is an invalid Bootstrap Framework version, or you are not connected to the Internet.".toString()
+		lines[0] == "Error: Could not download https://github.com/twbs/bootstrap/archive/v${version}.zip.".toString()
+		lines[1] == "${version} is an invalid Bootstrap Framework version, or you are not connected to the Internet.".toString()
 		PluginApplicationException exception = thrown()
 		exception.cause.class == InvalidUserDataException
 		exception.cause.message.startsWith("No old Bootstrap Framework zip files found in")
@@ -116,8 +118,8 @@ class GradlePluginSpec extends Specification {
 
 		then:
 		final List<String> lines = capture.toString().tokenize(System.properties["line.separator"])
-		lines[0].trim() == "Error: Could not download https://github.com/FortAwesome/Font-Awesome/archive/v${version}.zip.".toString()
-		lines[1].trim() == "${version} is an invalid Font Awesome version, or you are not connected to the Internet.".toString()
+		lines[0] == "Error: Could not download https://github.com/FortAwesome/Font-Awesome/archive/v${version}.zip.".toString()
+		lines[1] == "${version} is an invalid Font Awesome version, or you are not connected to the Internet.".toString()
 		PluginApplicationException exception = thrown()
 		exception.cause.class == InvalidUserDataException
 		exception.cause.message.startsWith("No old Font Awesome zip files found in")
@@ -213,9 +215,9 @@ class GradlePluginSpec extends Specification {
 
 		then:
 		final List<String> lines = capture.toString().tokenize(System.properties["line.separator"])
-		lines[0].trim() == "Error: Could not download https://github.com/twbs/bootstrap/archive/v${version}.zip.".toString()
-		lines[1].trim() == "${version} is an invalid Bootstrap Framework version, or you are not connected to the Internet.".toString()
-		lines[2].trim() == "Using Bootstrap Framework version $bootstrapDefaultVersion instead of $version.".toString()
+		lines[0] == "Error: Could not download https://github.com/twbs/bootstrap/archive/v${version}.zip.".toString()
+		lines[1] == "${version} is an invalid Bootstrap Framework version, or you are not connected to the Internet.".toString()
+		lines[2] == "Using Bootstrap Framework version $bootstrapDefaultVersion instead of $version.".toString()
 		notThrown(PluginApplicationException)
 	}
 
@@ -482,9 +484,9 @@ class GradlePluginSpec extends Specification {
 
 		then:
 		final List<String> lines = capture.toString().tokenize(System.properties["line.separator"])
-		lines[0].trim() == "Error: Could not download https://github.com/FortAwesome/Font-Awesome/archive/v${version}.zip.".toString()
-		lines[1].trim() == "${version} is an invalid Font Awesome version, or you are not connected to the Internet.".toString()
-		lines[2].trim() == "Using Font Awesome version $fontAwesomeDefaultVersion instead of $version.".toString()
+		lines[0] == "Error: Could not download https://github.com/FortAwesome/Font-Awesome/archive/v${version}.zip.".toString()
+		lines[1] == "${version} is an invalid Font Awesome version, or you are not connected to the Internet.".toString()
+		lines[2] == "Using Font Awesome version $fontAwesomeDefaultVersion instead of $version.".toString()
 		notThrown(PluginApplicationException)
 	}
 

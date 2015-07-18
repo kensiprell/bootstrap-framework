@@ -222,7 +222,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 				if (!project.file(path).exists()) {
 					project.mkdir(path)
 				}
-				files = fontAwesomeZipTree.matching {
+				def files = fontAwesomeZipTree.matching {
 					include "*/fonts/*"
 				}.collect()
 				from files
