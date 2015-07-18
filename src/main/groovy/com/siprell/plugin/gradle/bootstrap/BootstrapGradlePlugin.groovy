@@ -65,6 +65,8 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 				bootstrapZipTree = project.zipTree(file)
 			} else if (file instanceof String) {
 				throw new InvalidUserDataException(file)
+			} else {
+				throw new InvalidUserDataException("An unknow error occured trying to download $url")
 			}
 		}
 
@@ -79,6 +81,8 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 					fontAwesomeZipTree = project.zipTree(file)
 				} else if (file instanceof String) {
 					throw new InvalidUserDataException(file)
+				} else {
+					throw new InvalidUserDataException("An unknow error occured trying to download $url")
 				}
 			}
 		}
