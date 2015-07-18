@@ -51,7 +51,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 				throw new InvalidUserDataException("bootstrapFramework.cssPath directory ($cssPath) does not exist.")
 			}
 			if (!project.file(jsPath).exists()) {
-				throw new InvalidUserDataException("bootstrapFramework.jsPath directory (jsPath) does not exist.")
+				throw new InvalidUserDataException("bootstrapFramework.jsPath directory ($jsPath) does not exist.")
 			}
 		}
 
@@ -61,7 +61,11 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 			String url = "https://github.com/twbs/bootstrap/archive/v${bootstrapVersion}.zip"
 			String zipFilename = "${filePrefix}${bootstrapVersion}.zip"
 			def file = zipFile.download(tmpDir, description, filePrefix, url, bootstrapVersion, zipFilename, bootstrapInvalidVersionFails)
-			bootstrapZipTree = project.zipTree(file)
+			if (file instanceof File) {
+				bootstrapZipTree = project.zipTree(file)
+			} else if (file instanceof String) {
+				throw new InvalidUserDataException(file)
+			}
 		}
 
 		project.task("downloadFontAwesomeZip", dependsOn: project.tasks.downloadBootstrapZip) {
@@ -71,7 +75,11 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 				String url = "https://github.com/FortAwesome/Font-Awesome/archive/v${fontAwesomeVersion}.zip"
 				String zipFilename = "${filePrefix}${fontAwesomeVersion}.zip"
 				def file = zipFile.download(tmpDir, description, filePrefix, url, fontAwesomeVersion, zipFilename, fontAwesomeInvalidVersionFails)
-				fontAwesomeZipTree = project.zipTree(file)
+				if (file instanceof File) {
+					fontAwesomeZipTree = project.zipTree(file)
+				} else if (file instanceof String) {
+					throw new InvalidUserDataException(file)
+				}
 			}
 		}
 
@@ -363,7 +371,7 @@ class ZipFile {
 	String fileSuffix = ".zip"
 
 	def download(String tmp, String description, String filePrefix, String url, String version, String zipFilename, boolean invalidVersionFails) {
-		def message = "Could not download $url.\n$version is an invalid $description version, or you are not connected to the Internet."
+		def invalidVersionMessage = "Could not download $url.\n$version is an invalid $description version, or you are not connected to the Internet."
 		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection()
 		def tmpDir = new File("$tmp")
 		if (!tmpDir.exists()) {
@@ -373,26 +381,18 @@ class ZipFile {
 		if (zipFile.exists()) {
 			return zipFile
 		}
-		try {
-			connection.setRequestMethod("GET")
-			if (connection.getResponseCode() == 200) {
-				def file = zipFile.newOutputStream()
-				file << new URL(url).openStream()
-				file.close()
-				return zipFile
-			} else {
-				if (invalidVersionFails) {
-					throw new InvalidUserDataException(message)
-				} else {
-					println "Error: $message"
-				}
-			}
-		} catch (e) {
+		connection.setRequestMethod("GET")
+		if (connection.getResponseCode() == 200) {
+			def file = zipFile.newOutputStream()
+			file << new URL(url).openStream()
+			file.close()
+			return zipFile
+		} else {
 			zipFile.delete()
 			if (invalidVersionFails) {
-				throw new InvalidUserDataException(message)
+				return invalidVersionMessage.toString()
 			} else {
-				println "Error: $message"
+				println "Error: $invalidVersionMessage"
 			}
 		}
 		List<File> zipFiles = []
@@ -417,8 +417,7 @@ class ZipFile {
 			println "Using $description version $newVersion instead of $version."
 			return zipFileOld
 		} else {
-			throw new InvalidUserDataException("No old $description zip files found in $tmpDir.")
+			return "No old $description zip files found in $tmpDir.".toString()
 		}
 	}
 }
-

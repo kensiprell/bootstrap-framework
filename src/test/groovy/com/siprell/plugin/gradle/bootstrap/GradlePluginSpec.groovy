@@ -1,75 +1,157 @@
 package com.siprell.plugin.gradle.bootstrap
 
 import java.text.SimpleDateFormat
+import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project
+import org.gradle.api.internal.plugins.PluginApplicationException
 import org.gradle.testfixtures.ProjectBuilder
+import org.junit.Rule
+import org.springframework.boot.test.OutputCapture
 import spock.lang.Specification
 import spock.lang.Stepwise
 
-@Stepwise
+//@Stepwise
 class GradlePluginSpec extends Specification {
-    
-	static cssPath = "src/main/webapp/css"
-    static jsPath = "src/main/webapp/js"
-	static grailsCssPath = "grails-app/assets/stylesheets"
-    static grailsJsPath = "grails-app/assets/javascripts"
+
+	@Rule
+	OutputCapture capture = new OutputCapture()
+
+	static final bootstrapDefaultVersion = "3.3.5"
+	static final fontAwesomeDefaultVersion = "4.3.0"
+	static final cssPath = "src/main/webapp/css"
+	static final jsPath = "src/main/webapp/js"
+	static final grailsCssPath = "grails-app/assets/stylesheets"
+	static final grailsJsPath = "grails-app/assets/javascripts"
 	static boolean useAssetPipeline = true
 
 	def setupSpec() {
-	    deleteDirs()
-    	[
-    	    "$filePath.root/$cssPath",
-            "$filePath.root/$jsPath",
-    	    "$filePath.root/$grailsCssPath",
-            "$filePath.root/$grailsJsPath"
-        ].each {
-            new File("$it").mkdirs()
-        }
+		deleteDirs()
+		deleteZipFiles()
 	}
-	
+
 	def setup() {
-	    useAssetPipeline = true
+		useAssetPipeline = true
 	}
-	
+
 	def cleanupSpec() {
-	    deleteDirs()
-	}
-	
-	// TODO test missing directory exceptions
-
-	// TODO
-	//invalidVersionFails property
-	// exception thrown (mrhaki.blogspot.de/2011/01/spocklight-check-for-exceptions-with.html)
-	void "use invalid Bootstrap Framework version"() {
-		given:
-		true
+		deleteDirs()
 	}
 
-	// TODO
-	//invalidVersionFails property
-	// exception thrown (mrhaki.blogspot.de/2011/01/spocklight-check-for-exceptions-with.html)
-	void "use invalid Font Awesome version"() {
+	void "CSS resource directory does not exist"() {
+		when:
+		def properties = defaultProperties
+		createProject(properties)
+
+		then:
+		final List<String> lines = capture.toString().tokenize(System.properties["line.separator"])
+		lines.size() == 0
+		PluginApplicationException exception = thrown()
+		exception.cause.class == InvalidUserDataException
+		exception.cause.message == "bootstrapFramework.cssPath directory ($grailsCssPath) does not exist.".toString()
+	}
+
+	void "JavaScript resource directory does not exist"() {
 		given:
-		true
+		new File("$filePath.root/$grailsCssPath").mkdirs()
+
+		when:
+		def properties = defaultProperties
+		createProject(properties)
+
+		then:
+		final List<String> lines = capture.toString().tokenize(System.properties["line.separator"])
+		lines.size() == 0
+		PluginApplicationException exception = thrown()
+		exception.cause.class == InvalidUserDataException
+		exception.cause.message == "bootstrapFramework.jsPath directory ($grailsJsPath) does not exist.".toString()
+	}
+
+	void "use invalid Bootstrap Framework version with invalidVersionFails = false and no zip files available"() {
+		given:
+		createResourceDirs()
+		def version = "3.2.99"
+
+		when:
+		def properties = defaultProperties
+		properties.version = version
+		createProject(properties)
+
+		then:
+		final List<String> lines = capture.toString().tokenize(System.properties["line.separator"])
+		lines[0].trim() == ("Error: Could not download https://github.com/twbs/bootstrap/archive/v${version}.zip.").toString()
+		lines[1].trim() == ("${version} is an invalid Bootstrap Framework version, or you are not connected to the Internet.").toString()
+		PluginApplicationException exception = thrown()
+		exception.cause.class == InvalidUserDataException
+		exception.cause.message.startsWith("No old Bootstrap Framework zip files found in")
+	}
+
+	void "use invalid Bootstrap Framework version with invalidVersionFails = true and no zip files available"() {
+		given:
+		def version = "3.2.99"
+		def invalidVersionMessageStart = "Could not download".toString()
+		def invalidVersionMessageEnd = "$version is an invalid Bootstrap Framework version, or you are not connected to the Internet.".toString()
+
+		when:
+		def properties = defaultProperties
+		properties.version = version
+		properties.invalidVersionFails = true
+		createProject(properties)
+
+		then:
+		final List<String> lines = capture.toString().tokenize(System.properties["line.separator"])
+		lines.size() == 0
+		PluginApplicationException exception = thrown()
+		exception.cause.class == InvalidUserDataException
+		exception.cause.message.startsWith(invalidVersionMessageStart)
+		exception.cause.message.endsWith(invalidVersionMessageEnd)
+	}
+
+	void "use invalid Font Awesome version with invalidVersionFails = false and no zip files available"() {
+		given:
+		def version = "3.2.99"
+
+		when:
+		def properties = defaultProperties
+		properties.fontAwesome.install = true
+		properties.fontAwesome.version = version
+		createProject(properties)
+
+		then:
+		final List<String> lines = capture.toString().tokenize(System.properties["line.separator"])
+		lines[0].trim() == ("Error: Could not download https://github.com/FortAwesome/Font-Awesome/archive/v${version}.zip.").toString()
+		lines[1].trim() == ("${version} is an invalid Font Awesome version, or you are not connected to the Internet.").toString()
+		PluginApplicationException exception = thrown()
+		exception.cause.class == InvalidUserDataException
+		exception.cause.message.startsWith("No old Font Awesome zip files found in")
+	}
+
+	void "use invalid Font Awesome version with invalidVersionFails = true and no zip files available"() {
+		given:
+		def version = "3.2.99"
+		def invalidVersionMessageStart = "Could not download".toString()
+		def invalidVersionMessageEnd = "$version is an invalid Font Awesome version, or you are not connected to the Internet.".toString()
+
+		when:
+		def properties = defaultProperties
+		properties.fontAwesome.install = true
+		properties.fontAwesome.version = version
+		properties.fontAwesome.invalidVersionFails = true
+		createProject(properties)
+
+		then:
+		final List<String> lines = capture.toString().tokenize(System.properties["line.separator"])
+		lines.size() == 0
+		PluginApplicationException exception = thrown()
+		exception.cause.class == InvalidUserDataException
+		exception.cause.message.startsWith(invalidVersionMessageStart)
+		exception.cause.message.endsWith(invalidVersionMessageEnd)
 	}
 
 	void "change Bootstrap Framework version to #testVersion"() {
 		when:
 		def testVersion = "3.3.4"
-		def properties = [
-		version				: testVersion,
-		cssPath				: grailsCssPath,
-		jsPath				: grailsJsPath,
-		useIndividualJs		: false,
-		useLess				: false,
-		invalidVersionFails	: false,
-		fontAwesome : [
-			install				: false,
-			version				: "4.3.0",
-			useLess				: false,
-			invalidVersionFails	: false
-			]
-		]
+		def properties = defaultProperties
+		properties.version = testVersion
 		createProject(properties)
 		def prefix = "* Bootstrap v"
 		def suffix = " (http://getbootstrap.com)"
@@ -85,20 +167,7 @@ class GradlePluginSpec extends Specification {
 
 	void "apply plugin using default settings"() {
 		when:
-		def properties = [
-		version				: "3.3.5",
-		cssPath				: grailsCssPath,
-		jsPath				: grailsJsPath,
-		useIndividualJs		: false,
-		useLess				: false,
-		invalidVersionFails	: false,
-		fontAwesome : [
-			install				: false,
-			version				: "4.3.0",
-			useLess				: false,
-			invalidVersionFails	: false
-			]
-		]
+		def properties = defaultProperties
 		createProject(properties)
 		def data = currentData
 
@@ -133,24 +202,23 @@ class GradlePluginSpec extends Specification {
 		data.fontAwesomeLessCount == 0
 	}
 
+	// TODO
+	// must run this one after two zip files are available
+	// test console output
+	void "use invalid Boostrap Framework version with invalidVersionFails = false and zip files are available"() {
+		given:
+		true
+	}
+
 	void "apply plugin without asset-pipeline"() {
-		when:
-		def properties = [
-		version				: "3.3.5",
-		cssPath				: cssPath,
-		jsPath				: jsPath,
-		useIndividualJs		: false,
-		useLess				: false,
-		invalidVersionFails	: false,
-		fontAwesome : [
-			install				: false,
-			version				: "4.3.0",
-			useLess				: false,
-			invalidVersionFails	: false
-			]
-		]
-		createProject(properties)
+		given:
 		useAssetPipeline = false
+
+		when:
+		def properties = defaultProperties
+		properties.cssPath = cssPath
+		properties.jsPath = jsPath
+		createProject(properties)
 		def data = currentData
 
 		then:
@@ -186,20 +254,8 @@ class GradlePluginSpec extends Specification {
 
 	void "apply plugin using Bootstrap Framework individual JavaScript files"() {
 		when:
-		def properties = [
-		version				: "3.3.5",
-		cssPath				: grailsCssPath,
-		jsPath				: grailsJsPath,
-		useIndividualJs		: true,
-		useLess				: false,
-		invalidVersionFails	: false,
-		fontAwesome : [
-			install				: false,
-			version				: "4.3.0",
-			useLess				: false,
-			invalidVersionFails	: false
-			]
-		]
+		def properties = defaultProperties
+		properties.useIndividualJs = true
 		createProject(properties)
 		def data = currentData
 
@@ -236,20 +292,8 @@ class GradlePluginSpec extends Specification {
 
 	void "apply plugin using Bootstrap Framework LESS support"() {
 		when:
-		def properties = [
-		version				: "3.3.5",
-		cssPath				: grailsCssPath,
-		jsPath				: grailsJsPath,
-		useIndividualJs		: false,
-		useLess				: true,
-		invalidVersionFails	: false,
-		fontAwesome : [
-			install				: false,
-			version				: "4.3.0",
-			useLess				: false,
-			invalidVersionFails	: false
-			]
-		]
+		def properties = defaultProperties
+		properties.useLess = true
 		createProject(properties)
 		def data = currentData
 
@@ -286,20 +330,9 @@ class GradlePluginSpec extends Specification {
 
 	void "apply plugin using Bootstrap Framework version LESS support and individual JavaScript files"() {
 		when:
-		def properties = [
-		version				: "3.3.5",
-		cssPath				: grailsCssPath,
-		jsPath				: grailsJsPath,
-		useIndividualJs		: true,
-		useLess				: true,
-		invalidVersionFails	: false,
-		fontAwesome : [
-			install				: false,
-			version				: "4.3.0",
-			useLess				: false,
-			invalidVersionFails	: false
-			]
-		]
+		def properties = defaultProperties
+		properties.useIndividualJs = true
+		properties.useLess = true
 		createProject(properties)
 		def data = currentData
 
@@ -337,20 +370,9 @@ class GradlePluginSpec extends Specification {
 	void "change Font Awesome version to #testVersion"() {
 		when:
 		def testVersion = "4.2.0"
-		def properties = [
-		version				: "3.3.5",
-		cssPath				: grailsCssPath,
-		jsPath				: grailsJsPath,
-		useIndividualJs		: false,
-		useLess				: false,
-		invalidVersionFails	: false,
-		fontAwesome : [
-			install				: true,
-			version				: testVersion,
-			useLess				: false,
-			invalidVersionFails	: false
-			]
-		]
+		def properties = defaultProperties
+		properties.fontAwesome.install = true
+		properties.fontAwesome.version = testVersion
 		createProject(properties)
 		def prefix = "*  Font Awesome "
 		def suffix = " by @davegandy - http://fontawesome.io - @fontawesome"
@@ -363,20 +385,8 @@ class GradlePluginSpec extends Specification {
 
 	void "apply plugin using default Bootstrap Framework and Font Awesome settings"() {
 		when:
-		def properties = [
-		version				: "3.3.5",
-		cssPath				: grailsCssPath,
-		jsPath				: grailsJsPath,
-		useIndividualJs		: false,
-		useLess				: false,
-		invalidVersionFails	: false,
-		fontAwesome : [
-			install				: true,
-			version				: "4.3.0",
-			useLess				: false,
-			invalidVersionFails	: false
-			]
-		]
+		def properties = defaultProperties
+		properties.fontAwesome.install = true
 		createProject(properties)
 		def data = currentData
 
@@ -402,7 +412,7 @@ class GradlePluginSpec extends Specification {
 		!data.mixins.exists()
 		data.mixinsCount == 0
 		data.fontAwesomeAllCss.exists()
-		!data.fontAwesomeLessLess.exists() 
+		!data.fontAwesomeLessLess.exists()
 		data.fontAwesomeCss.exists()
 		data.fontAwesomeFonts.exists()
 		data.fontAwesomeFontsCount == 6
@@ -412,20 +422,9 @@ class GradlePluginSpec extends Specification {
 
 	void "apply plugin using Bootstrap Framework default settings and Font Awesome with LESS support"() {
 		when:
-		def properties = [
-		version				: "3.3.5",
-		cssPath				: grailsCssPath,
-		jsPath				: grailsJsPath,
-		useIndividualJs		: false,
-		useLess				: false,
-		invalidVersionFails	: false,
-		fontAwesome : [
-			install				: true,
-			version				: "4.3.0",
-			useLess				: true,
-			invalidVersionFails	: false
-			]
-		]
+		def properties = defaultProperties
+		properties.fontAwesome.install = true
+		properties.fontAwesome.useLess = true
 		createProject(properties)
 		def data = currentData
 
@@ -460,11 +459,55 @@ class GradlePluginSpec extends Specification {
 		data.fontAwesomeLessCount == 13
 	}
 
-	def deleteDirs() {
+	// TODO
+	// must run this one after two zip files are available
+	// test console output
+	void "use invalid Font Awesome version with invalidVersionFails = false and zip files are available"() {
+		given:
+		true
+	}
+
+	static createResourceDirs() {
+		[
+			"$filePath.root/$cssPath",
+			"$filePath.root/$jsPath",
+			"$filePath.root/$grailsCssPath",
+			"$filePath.root/$grailsJsPath"
+		].each {
+			new File("$it").mkdirs()
+		}
+	}
+
+	static deleteDirs() {
 		new File("$filePath.root/grails-app").deleteDir()
 		new File("$filePath.root/src/main/webapp").deleteDir()
 	}
-	
+
+	static deleteZipFiles() {
+		new File("$filePath.root/build/tmp").listFiles().each {
+			if (it.name.startsWith("bootstrap") || it.name.startsWith("fontAwesome")) {
+				it.delete()
+			}
+		}
+	}
+
+	static getDefaultProperties() {
+		[
+			version            : bootstrapDefaultVersion,
+			cssPath            : grailsCssPath,
+			jsPath             : grailsJsPath,
+			useIndividualJs    : false,
+			useLess            : false,
+			invalidVersionFails: false,
+			fontAwesome        : [
+				install            : false,
+				version            : fontAwesomeDefaultVersion,
+				useLess            : false,
+				invalidVersionFails: false
+			]
+		]
+	}
+
 	static createProject(properties) {
 		Project project = ProjectBuilder.builder().withProjectDir(new File(filePath.root)).build()
 		project.ext.bootstrapFramework = properties
@@ -587,4 +630,3 @@ class GradlePluginSpec extends Specification {
 		sdf.format(date)
 	}
 }
-
