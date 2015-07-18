@@ -8,9 +8,7 @@ import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Rule
 import org.springframework.boot.test.OutputCapture
 import spock.lang.Specification
-import spock.lang.Stepwise
 
-//@Stepwise
 class GradlePluginSpec extends Specification {
 
 	@Rule
@@ -78,8 +76,8 @@ class GradlePluginSpec extends Specification {
 
 		then:
 		final List<String> lines = capture.toString().tokenize(System.properties["line.separator"])
-		lines[0].trim() == ("Error: Could not download https://github.com/twbs/bootstrap/archive/v${version}.zip.").toString()
-		lines[1].trim() == ("${version} is an invalid Bootstrap Framework version, or you are not connected to the Internet.").toString()
+		lines[0].trim() == "Error: Could not download https://github.com/twbs/bootstrap/archive/v${version}.zip.".toString()
+		lines[1].trim() == "${version} is an invalid Bootstrap Framework version, or you are not connected to the Internet.".toString()
 		PluginApplicationException exception = thrown()
 		exception.cause.class == InvalidUserDataException
 		exception.cause.message.startsWith("No old Bootstrap Framework zip files found in")
@@ -118,8 +116,8 @@ class GradlePluginSpec extends Specification {
 
 		then:
 		final List<String> lines = capture.toString().tokenize(System.properties["line.separator"])
-		lines[0].trim() == ("Error: Could not download https://github.com/FortAwesome/Font-Awesome/archive/v${version}.zip.").toString()
-		lines[1].trim() == ("${version} is an invalid Font Awesome version, or you are not connected to the Internet.").toString()
+		lines[0].trim() == "Error: Could not download https://github.com/FortAwesome/Font-Awesome/archive/v${version}.zip.".toString()
+		lines[1].trim() == "${version} is an invalid Font Awesome version, or you are not connected to the Internet.".toString()
 		PluginApplicationException exception = thrown()
 		exception.cause.class == InvalidUserDataException
 		exception.cause.message.startsWith("No old Font Awesome zip files found in")
@@ -148,13 +146,15 @@ class GradlePluginSpec extends Specification {
 	}
 
 	void "change Bootstrap Framework version to #testVersion"() {
-		when:
+		given:
 		def testVersion = "3.3.4"
+		def prefix = "* Bootstrap v"
+		def suffix = " (http://getbootstrap.com)"
+
+		when:
 		def properties = defaultProperties
 		properties.version = testVersion
 		createProject(properties)
-		def prefix = "* Bootstrap v"
-		def suffix = " (http://getbootstrap.com)"
 		def cssFile = new File("$filePath.css/bootstrap.css")
 		def jsFile = new File("$filePath.js/bootstrap.js")
 		def cssFileVersion = cssFile.readLines().get(1).trim() - prefix - suffix
@@ -202,12 +202,21 @@ class GradlePluginSpec extends Specification {
 		data.fontAwesomeLessCount == 0
 	}
 
-	// TODO
-	// must run this one after two zip files are available
-	// test console output
-	void "use invalid Boostrap Framework version with invalidVersionFails = false and zip files are available"() {
+	void "use invalid Bootstrap Framework version with invalidVersionFails = false and zip files are available"() {
 		given:
-		true
+		def version = "3.2.99"
+
+		when:
+		def properties = defaultProperties
+		properties.version = version
+		createProject(properties)
+
+		then:
+		final List<String> lines = capture.toString().tokenize(System.properties["line.separator"])
+		lines[0].trim() == "Error: Could not download https://github.com/twbs/bootstrap/archive/v${version}.zip.".toString()
+		lines[1].trim() == "${version} is an invalid Bootstrap Framework version, or you are not connected to the Internet.".toString()
+		lines[2].trim() == "Using Bootstrap Framework version $bootstrapDefaultVersion instead of $version.".toString()
+		notThrown(PluginApplicationException)
 	}
 
 	void "apply plugin without asset-pipeline"() {
@@ -368,14 +377,16 @@ class GradlePluginSpec extends Specification {
 	}
 
 	void "change Font Awesome version to #testVersion"() {
-		when:
+		given:
 		def testVersion = "4.2.0"
+		def prefix = "*  Font Awesome "
+		def suffix = " by @davegandy - http://fontawesome.io - @fontawesome"
+
+		when:
 		def properties = defaultProperties
 		properties.fontAwesome.install = true
 		properties.fontAwesome.version = testVersion
 		createProject(properties)
-		def prefix = "*  Font Awesome "
-		def suffix = " by @davegandy - http://fontawesome.io - @fontawesome"
 		def cssFile = new File("$filePath.faCss/font-awesome.css")
 		def cssFileVersion = cssFile.readLines().get(1).trim() - prefix - suffix
 
@@ -459,12 +470,22 @@ class GradlePluginSpec extends Specification {
 		data.fontAwesomeLessCount == 13
 	}
 
-	// TODO
-	// must run this one after two zip files are available
-	// test console output
 	void "use invalid Font Awesome version with invalidVersionFails = false and zip files are available"() {
 		given:
-		true
+		def version = "3.2.99"
+
+		when:
+		def properties = defaultProperties
+		properties.fontAwesome.install = true
+		properties.fontAwesome.version = version
+		createProject(properties)
+
+		then:
+		final List<String> lines = capture.toString().tokenize(System.properties["line.separator"])
+		lines[0].trim() == "Error: Could not download https://github.com/FortAwesome/Font-Awesome/archive/v${version}.zip.".toString()
+		lines[1].trim() == "${version} is an invalid Font Awesome version, or you are not connected to the Internet.".toString()
+		lines[2].trim() == "Using Font Awesome version $fontAwesomeDefaultVersion instead of $version.".toString()
+		notThrown(PluginApplicationException)
 	}
 
 	static createResourceDirs() {
@@ -578,7 +599,6 @@ class GradlePluginSpec extends Specification {
 		def lessCount = less.exists() ? less.listFiles().size() : 0
 		def mixins = new File(filePath.mixins)
 		def mixinsCount = mixins.exists() ? mixins.listFiles().size() : 0
-		// FontAwesome
 		def fontAwesomeAllCss = new File("${filePath.stylesheets}/font-awesome-all.css")
 		def fontAwesomeLessLess = new File("${filePath.stylesheets}/font-awesome-less.less")
 		def stylesheetsFontAwesome = new File("${filePath.stylesheets}/font-awesome")

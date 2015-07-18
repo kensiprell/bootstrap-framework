@@ -159,9 +159,8 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 
 		project.task("createBootstrapLess", type: Sync, dependsOn: project.tasks.createBootstrapLessLess) {
 			def path = "${project.projectDir}/$cssPath/bootstrap/less"
-			def files = []
 			if (useLess) {
-				files = bootstrapZipTree.matching {
+				def files = bootstrapZipTree.matching {
 					include "*/less/*.less"
 				}.collect()
 				from files
@@ -236,7 +235,6 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 
 		project.task("createFontAwesomeLessLess", type: Copy, dependsOn: project.tasks.createFontAwesomeFonts) {
 			if (fontAwesomeInstall && fontAwesomeUseLess) {
-				def target = "font-awesome-less.less"
 				if (cssPath.contains("assets")) {
 					from template.getFile(project, "createFontAwesomeLessLessAssets")
 				} else {
@@ -249,9 +247,8 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 
 		project.task("createFontAwesomeLess", type: Sync, dependsOn: project.tasks.createFontAwesomeLessLess) {
 			def path = "${project.projectDir}/$cssPath/font-awesome/less"
-			def files = []
 			if (fontAwesomeInstall && fontAwesomeUseLess) {
-				files = fontAwesomeZipTree.matching {
+				def files = fontAwesomeZipTree.matching {
 					include "*/less/*.less"
 				}.collect()
 				from files
