@@ -31,7 +31,6 @@ repositories {
 dependencies {
 	compile gradleApi()
 	compile localGroovy()
-
 	testCompile("org.spockframework:spock-core:1.0-groovy-2.3")
 	testCompile("org.springframework.boot:spring-boot:1.2.1.RELEASE")
 }
@@ -71,7 +70,6 @@ publishing {
 			artifact sourcesJar
 		}
 	}
-
 	repositories {
 		maven {
 			credentials {

@@ -218,7 +218,6 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 
 		project.task("createFontAwesomeFonts", type: Sync, dependsOn: project.tasks.createFontAwesomeCssIndividual) {
 			def path = "${project.projectDir}/$cssPath/font-awesome/fonts"
-			def files = []
 			if (fontAwesomeInstall) {
 				if (!project.file(path).exists()) {
 					project.mkdir(path)
