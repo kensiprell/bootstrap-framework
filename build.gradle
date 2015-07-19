@@ -90,7 +90,7 @@ bintray {
 	pkg {
 		repo = "gradle-plugins"
 		name = "bootstrap-framework"
-		desc = "Gradle plugin for integrating the Bootstrap Framework"
+		desc = "Gradle plugin for integrating the Bootstrap Framework and Font Awesome"
 		websiteUrl = "https://github.com/kensiprell/bootstrap-framework"
 		issueTrackerUrl = "https://github.com/kensiprell/bootstrap-framework/issues"
 		vcsUrl = "https://github.com/kensiprell/bootstrap-framework.git"

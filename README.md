@@ -1,6 +1,8 @@
-## Gradle plugin for integrating the Bootstrap Framework, including Font Awesome
+## Gradle plugin for integrating the Bootstrap Framework and Font Awesome
 
 [Bootstrap](http://getbootstrap.com) bills itself as "the most popular HTML, CSS, and JS framework for developing responsive, mobile first projects on the web."
+
+[Font Awesome](http://fortawesome.github.io/Font-Awesome/) is the iconic font and CSS toolkit.
 
 If you have a question, suggestion, or want to report a bug, please submit an [issue](https://github.com/kensiprell/bootstrap-framework/issues). I will reply as soon as I can.
 
