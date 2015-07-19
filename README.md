@@ -8,9 +8,9 @@ If you have a question, suggestion, or want to report a bug, please submit an [i
 
 ### Highlights
 
-* The Bootstrap version can be configured in your application's ```build.gradle```, which means you do not have to install a different version of the plugin to get a different Bootstrap version, nor do you have to wait on a plugin update to use the latest Bootstrap release.
+* The Bootstrap version can be configured in your application's ```build.gradle``` file, which means you do not have to install a different version of the plugin to get a different Bootstrap version, nor do you have to wait on a plugin update to use the latest Bootstrap release.
 
-* The plugin can also manage [Font Awesome](http://fortawesome.github.io/Font-Awesome/) files, including LESS support.
+* The plugin can also manage Font Awesome files, including LESS support.
 
 * The plugin supports the [asset-pipeline-core](https://github.com/bertramdev/asset-pipeline-core) plugin and its [less-asset-pipeline](https://github.com/bertramdev/less-asset-pipeline) module out of the box.
 
@@ -20,7 +20,7 @@ This Grails [sample application](https://github.com/kensiprell/bootstrap-framewo
 
 ### Installation
 
-Add the following lines to the ```buildscript``` closure in your application's ```build.gradle``` file. The commented-out lines show the plugin default values, and if you are using Grails, they are not required for the plugin to work. See the [Configuration Options](https://github.com/kensiprell/bootstrap-framework#configuration-optinos) section for the details.
+Add the following lines to your application's ```build.gradle``` file. The commented-out lines show the plugin default values, and if you are using Grails, they are not required for the plugin to work. See the [Configuration Options](https://github.com/kensiprell/bootstrap-framework#configuration-options) section for the details.
 
     buildscript {
         ext {
@@ -43,12 +43,9 @@ Add the following lines to the ```buildscript``` closure in your application's `
             jcenter()
         }
         dependencies {
-            classpath "com.siprell.plugins:bootstrap-framework:0.9.1"
+            classpath "com.siprell.plugins:bootstrap-framework:1.0.0"
         }
     }
-
-
-Add the following line to the root of your application's ```build.gradle```file.
 
     apply plugin: "bootstrap-framework"
         
@@ -56,31 +53,31 @@ Add the following line to the root of your application's ```build.gradle```file.
 
 The following options can be configured in the ```bootstrapFramework``` Map.
 
-#### version
+#### bootstrapFramework.version
 
 Use the property below to change the Bootstrap Framework version used by your application.
 
     version : "3.3.1"
 
-#### cssPath
+#### bootstrapFramework.cssPath
 
 Use the property below to define the location where the Bootstrap CSS, fonts, and LESS files are copied.  
     
     cssPath : "src/main/web-app/resources/css"
     
-#### jsPath
+#### bootstrapFramework.jsPath
     
 Use the property below to define the location where the Bootstrap JavaScript files are copied.  
     
     jsPath : "src/main/web-app/resources/js"
     
-#### useIndividualJs
+#### bootstrapFramework.useIndividualJs
 
-If the property below is set to ```true```, the plugin will copy all individual JavaScript files to ```"${bootstrapFramework.jsPath}/bootstrap"```. Otherwise, it will only copy the bootstrap.js file to the directory.
+If the property below is set to ```true```, the plugin will copy all individual JavaScript files to ```"${bootstrapFramework.jsPath}/bootstrap"```. Otherwise, it will only copy the ```bootstrap.js``` file to the directory.
     
     useIndividualJs : true
     
-#### useLess
+#### bootstrapFramework.useLess
 
 If the property below is set to ```true```, the plugin will copy all Bootstrap Framework LESS and mixin files to ```"${bootstrapFramework.cssPath}/bootstrap/less"```.
 
@@ -88,23 +85,29 @@ If the property below is set to ```true```, the plugin will copy all Bootstrap F
     
 #### invalidVersionFails
 
-The ```invalidVersionFails``` property can be configured individually for ```bootstrapFramework``` and ```bootstrapFramework.fontAwesome```. When the property is at its default of ```false``` and you have entered an invalid version number, the plugin will search the ```build/tmp``` directory for other versions of the appropriate zip file and use the one with the highest version number. This could be useful if you want the build to continue or you do not have an Internet connection. 
+The ```invalidVersionFails``` property can be configured individually for ```bootstrapFramework``` and ```bootstrapFramework.fontAwesome```. When the property is at its default of ```false``` and you have entered an invalid version number, the plugin will search the ```build/tmp``` directory for other versions of the appropriate zip file and use the one with the highest version number. It will also display a warning message in the console.  
 
-Although the plugin will print a warning to the console, you might overlook it. You can disable this behavior by setting this property to ```true```. If the plugin cannot download the version you specified, it will throw an ```org.gradle.api.InvalidUserDataException```.
+You can disable this behavior by setting this property to ```true```. If the plugin cannot download the version you specified, it will throw an ```org.gradle.api.InvalidUserDataException```.
 
-    invalidVersionFails : true
+    bootstrapFramework = [
+        invalidVersionFails : true
+        fontAwesome : [
+            install : true,
+            invalidVersionFails : true
+        ]
+    ]
 
-#### fontAwesome.install
+#### bootstrapFramework.fontAwesome.install
 
 If ```bootstrapFramework.fontAwesome.install``` is set to ```true```, the plugin will install the Font Awesome fonts using the default plugin version without LESS support.
 
     bootstrapFramework = [
         fontAwesome : [
             install : true
-        ]  
+        ]
     ]
 
-#### fontAwesome.version
+#### bootstrapFramework.fontAwesome.version
 
 You can change the Font Awesome version by setting the ```bootstrapFramework.fontAwesome.version``` property.
 
@@ -115,9 +118,9 @@ You can change the Font Awesome version by setting the ```bootstrapFramework.fon
         ]  
     ]
 
-#### fontAwesome.useLess
+#### bootstrapFramework.fontAwesome.useLess
 
-You add LESS support for Font Awesome by setting the ```bootstrapFramework.fontAwesome.useLess``` property.
+You can add LESS support for Font Awesome by setting the ```bootstrapFramework.fontAwesome.useLess``` property.
 
     bootstrapFramework = [
         fontAwesome : [
@@ -128,11 +131,11 @@ You add LESS support for Font Awesome by setting the ```bootstrapFramework.fontA
 
 ### How the Plugin Works
 
-The plugin downloads the appropriate Bootstrap zip file and copies it to your application's ```build/tmp``` directory. The plugin will extract the necessary files and copy them to the directories defined by the ```bootstrapFramework.cssPath``` and ```bootstrapFramework.jsPath``` properties.
+The plugin downloads the appropriate Bootstrap or Font Awesome zip file and copies it to your application's ```build/tmp``` directory. The plugin will extract the necessary files and copy them to the directories defined by the ```bootstrapFramework.cssPath``` and ```bootstrapFramework.jsPath``` properties.
 
-The Bootstrap files are copied into the directory trees shown below. It is important that you do not put any files in the two ```bootstrap``` directories because they will be overwritten.
+The files are copied into the directory trees shown below. It is important that you do not put any files in the two ```bootstrap``` directories (```bootstrapFramework.cssPath``` and ```bootstrapFramework.jsPath```) because they will be overwritten.
 
-The ```bootstrap-all.js```, ```bootstrap-all.css```, and ```bootstrap-less.less``` files are generated for the asset-pipeline plugin if you are using Grails or the word "assets" is contained in ```bootstrapFramework.jsPath``` property.
+The ```bootstrap-all.js```, ```bootstrap-all.css```, and ```bootstrap-less.less``` files are generated for the asset-pipeline plugin if you are using Grails or the word "assets" is contained in the ```bootstrapFramework.jsPath``` property.
 
 Directory ```bootstrapFramework.jsPath```:
 
@@ -153,10 +156,7 @@ Directory ```bootstrapFramework.cssPath```:
     |    |    |    bootstrap.css
     |    |----fonts/
     |    |    |    glyphicons-halflings-regular.eot
-    |    |    |    glyphicons-halflings-regular.svg
-    |    |    |    glyphicons-halflings-regular.ttf
-    |    |    |    glyphicons-halflings-regular.woff
-    |    |    |    glyphicons-halflings-regular.woff2
+    |    |    |    etc.
     |    |----less/
     |    |    |    alerts.less
     |    |    |    badges.less
@@ -179,20 +179,28 @@ Directory ```bootstrapFramework.cssPath```:
 
 ### User Task
 
-The plugin comes with a user-land task that shows the Bootstrap Framework versions.
+You can use the task shown below to display the default Bootstrap Framework and Font Awesome versions used by the plugin.
 
-    gradle bootstrapFrameworkVersions
+    ./gradlew bootstrapFrameworkVersions
+    
+or
+    
+    ./gradlew bFV
     
 The output will be similar to:
 
     3.3.5 is the default Bootstrap Framework version.
     4.3.0 is the default Font Awesome version.
    
+### Glyphicons
+
+The Glyphicons icons are available as described in the [Bootstrap Components](http://getbootstrap.com/components/) section.
+
 ### Asset Pipeline Usage
 
-The remaining sections demonstrate how to include the Bootstrap Framework in your application using the ```asset-pipeline-core``` plugin and its ```less-asset-pipeline``` module. 
+The remaining sections outline how to include Bootstrap Framework and Font Awesome in your application using the ```asset-pipeline-core``` plugin and its ```less-asset-pipeline``` module. 
 
-### JavaScript
+#### JavaScript
 
 The instructions below assume the manifest file is in the ```grails-app/assets/javascripts``` directory.
 
@@ -220,11 +228,11 @@ Or add the line below to a GSP:
 
     <asset:javascript src="bootstrap/bootstrap-affix.js"/>
 
-### Stylesheets
+#### Stylesheets
 
 The instructions below assume the manifest file is in the ```grails-app/assets/stylesheets``` directory.
 
-#### Add all Bootstrap CSS Files
+#### Add all Bootstrap and Font Awesome CSS Files
 
 Add the lines below to a manifest:
 
@@ -297,11 +305,8 @@ Use the file below for customizing Font Awesome.
 
     @import "font-awesome/less/font-awesome.less";
 
+    @fa-font-path: "/assets/font-awesome/fonts";
+
     /*
     * Your customizations go below this section.
     */
-
-### Glyphicons
-
-The Glyphicons icons are available as described in the [Boostrap Components](http://getbootstrap.com/components/) section.
-
