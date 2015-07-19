@@ -6,6 +6,8 @@
 
 If you have a question, suggestion, or want to report a bug, please submit an [issue](https://github.com/kensiprell/bootstrap-framework/issues). I will reply as soon as I can.
 
+[ ![Download](https://api.bintray.com/packages/kensiprell/gradle-plugins/bootstrap-framework/images/download.svg) ](https://bintray.com/kensiprell/gradle-plugins/bootstrap-framework/_latestVersion)
+
 ### Highlights
 
 * The Bootstrap version can be configured in your application's ```build.gradle``` file, which means you do not have to install a different version of the plugin to get a different Bootstrap version, nor do you have to wait on a plugin update to use the latest Bootstrap release.
