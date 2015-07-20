@@ -6,7 +6,7 @@
 
 If you have a question, suggestion, or want to report a bug, please submit an [issue](https://github.com/kensiprell/bootstrap-framework/issues). I will reply as soon as I can.
 
-[ ![Download](https://api.bintray.com/packages/kensiprell/gradle-plugins/bootstrap-framework/images/download.svg) ](https://bintray.com/kensiprell/gradle-plugins/bootstrap-framework/_latestVersion)
+<!-- [ ![Download](https://api.bintray.com/packages/kensiprell/gradle-plugins/bootstrap-framework/images/download.svg) ](https://bintray.com/kensiprell/gradle-plugins/bootstrap-framework/_latestVersion) -->
 
 ### Highlights
 
