@@ -66,10 +66,10 @@ class GradlePluginSpec extends Specification {
 
 	void "use invalid Bootstrap Framework version with invalidVersionFails = false and no zip files available"() {
 		given:
-		createResourceDirs()
-		def version = "3.2.99"
+		createDirs()
 
 		when:
+		def version = "3.2.99"
 		def properties = defaultProperties
 		properties.version = version
 		createProject(properties)
@@ -84,12 +84,10 @@ class GradlePluginSpec extends Specification {
 	}
 
 	void "use invalid Bootstrap Framework version with invalidVersionFails = true and no zip files available"() {
-		given:
+		when:
 		def version = "3.2.99"
 		def invalidVersionMessageStart = "Could not download".toString()
 		def invalidVersionMessageEnd = "$version is an invalid Bootstrap Framework version, or you are not connected to the Internet.".toString()
-
-		when:
 		def properties = defaultProperties
 		properties.version = version
 		properties.invalidVersionFails = true
@@ -105,10 +103,8 @@ class GradlePluginSpec extends Specification {
 	}
 
 	void "use invalid Font Awesome version with invalidVersionFails = false and no zip files available"() {
-		given:
-		def version = "3.2.99"
-
 		when:
+		def version = "3.2.99"
 		def properties = defaultProperties
 		properties.fontAwesome.install = true
 		properties.fontAwesome.version = version
@@ -124,12 +120,10 @@ class GradlePluginSpec extends Specification {
 	}
 
 	void "use invalid Font Awesome version with invalidVersionFails = true and no zip files available"() {
-		given:
+		when:
 		def version = "3.2.99"
 		def invalidVersionMessageStart = "Could not download".toString()
 		def invalidVersionMessageEnd = "$version is an invalid Font Awesome version, or you are not connected to the Internet.".toString()
-
-		when:
 		def properties = defaultProperties
 		properties.fontAwesome.install = true
 		properties.fontAwesome.version = version
@@ -146,12 +140,10 @@ class GradlePluginSpec extends Specification {
 	}
 
 	void "change Bootstrap Framework version to #testVersion"() {
-		given:
+		when:
 		def testVersion = "3.3.4"
 		def prefix = "* Bootstrap v"
 		def suffix = " (http://getbootstrap.com)"
-
-		when:
 		def properties = defaultProperties
 		properties.version = testVersion
 		createProject(properties)
@@ -203,12 +195,10 @@ class GradlePluginSpec extends Specification {
 	}
 
 	void "use invalid Bootstrap Framework version with invalidVersionFails = false and zip files are available"() {
-		given:
+		when:
 		def version = "3.2.99"
 		def prefix = "* Bootstrap v"
 		def suffix = " (http://getbootstrap.com)"
-
-		when:
 		def properties = defaultProperties
 		properties.version = version
 		createProject(properties)
@@ -385,12 +375,10 @@ class GradlePluginSpec extends Specification {
 	}
 
 	void "change Font Awesome version to #testVersion"() {
-		given:
+		when:
 		def testVersion = "4.2.0"
 		def prefix = "*  Font Awesome "
 		def suffix = " by @davegandy - http://fontawesome.io - @fontawesome"
-
-		when:
 		def properties = defaultProperties
 		properties.fontAwesome.install = true
 		properties.fontAwesome.version = testVersion
@@ -501,7 +489,7 @@ class GradlePluginSpec extends Specification {
 		notThrown(PluginApplicationException)
 	}
 
-	static createResourceDirs() {
+	static createDirs() {
 		[
 			"$filePath.root/$cssPath",
 			"$filePath.root/$jsPath",
@@ -579,8 +567,8 @@ class GradlePluginSpec extends Specification {
 		[
 			root       : root,
 			javascripts: javascripts,
-			js         : js,
 			stylesheets: stylesheets,
+			js         : js,
 			css        : css,
 			fonts      : fonts,
 			less       : less,

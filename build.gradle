@@ -15,7 +15,7 @@ apply plugin: "groovy"
 apply plugin: "maven-publish"
 apply plugin: "maven"
 
-version "0.9.4"
+version "1.0.0.-SNAPSHOT"
 group = "com.siprell.plugins"
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
@@ -99,6 +99,10 @@ bintray {
 		publicDownloadNumbers = true
 	}
 }
+
+
+//TODO
+// https://plugins.gradle.org/docs/submit
 
 task sourcesJar(type: Jar) {
 	classifier = "sources"
