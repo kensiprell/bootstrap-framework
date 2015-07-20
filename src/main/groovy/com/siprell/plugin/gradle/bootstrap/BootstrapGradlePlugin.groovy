@@ -371,8 +371,6 @@ class ZipFile {
 	String fileSuffix = ".zip"
 
 	def download(String tmp, String description, String filePrefix, String url, String version, String zipFilename, boolean invalidVersionFails) {
-		def invalidVersionMessage = "Could not download $url.\n$version is an invalid $description version, or you are not connected to the Internet."
-		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection()
 		def tmpDir = new File("$tmp")
 		if (!tmpDir.exists()) {
 			tmpDir.mkdir()
@@ -381,6 +379,8 @@ class ZipFile {
 		if (zipFile.exists()) {
 			return zipFile
 		}
+		def invalidVersionMessage = "Could not download $url.\n$version is an invalid $description version, or you are not connected to the Internet."
+		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection()
 		connection.setRequestMethod("GET")
 		if (connection.getResponseCode() == 200) {
 			def file = zipFile.newOutputStream()
