@@ -2,25 +2,34 @@ buildscript {
 	repositories {
 		mavenLocal()
 		jcenter()
+		maven {
+			url "https://plugins.gradle.org/m2/"
+		}
 	}
-	dependencies {
-	}
+	dependencies {}
 }
 
 plugins {
+	id "groovy"
+	id "maven"
+	id "maven-publish"
+	id "com.gradle.plugin-publish" version "0.9.1"
 	id "com.jfrog.bintray" version "1.2"
 }
-
-apply plugin: "groovy"
-apply plugin: "maven-publish"
-apply plugin: "maven"
 
 version "1.0.0-SNAPSHOT"
 group = "com.siprell.plugins"
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
 
-ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
+ext {
+	artifactId = "bootstrap-framework"
+	isReleaseVersion = !version.endsWith("SNAPSHOT")
+	description = "Gradle plugin for integrating the Bootstrap Framework and Font Awesome"
+	labels = ["bootstrap", "fontawesome", "font awesome", "gradle"]
+	websiteUrl = "https://github.com/kensiprell/bootstrap-framework"
+	vcsUrl = "https://github.com/kensiprell/bootstrap-framework.git"
+}
 
 repositories {
 	jcenter()
@@ -35,18 +44,34 @@ dependencies {
 	testCompile("org.springframework.boot:spring-boot:1.2.1.RELEASE")
 }
 
+task sourcesJar(type: Jar) {
+	classifier = "sources"
+	from sourceSets.main.allSource
+}
+
+task(console, dependsOn: "classes", type: JavaExec) {
+	main = "groovy.ui.Console"
+	classpath = sourceSets.main.runtimeClasspath
+}
+
+test {
+	testLogging {
+		showStandardStreams = true
+	}
+}
+
 publishing {
 	publications {
 		maven(MavenPublication) {
-			artifactId "bootstrap-framework"
+			artifactId artifactId
 			pom.withXml {
 				asNode().children().last() + {
 					resolveStrategy = Closure.DELEGATE_FIRST
 					name "bootstrap-framework"
-					description "Gradle plugin for integrating the Bootstrap Framework."
-					url "https://github.com/kensiprell/bootstrap-framework"
+					description description
+					url websiteUrl
 					scm {
-						url "https://github.com/kensiprell/bootstrap-framework"
+						url websiteUrl
 						connection "scm:https://github.com/kensiprell/bootstrap-framework.git"
 						developerConnection "scm:git://github.com/kensiprell/bootstrap-framework.git"
 					}
@@ -70,15 +95,6 @@ publishing {
 			artifact sourcesJar
 		}
 	}
-	repositories {
-		maven {
-			credentials {
-				username project.properties.get("artifactoryPublishUsername")
-				password project.properties.get("artifactoryPublishPassword")
-			}
-			url "https://repo.grails.org/grails/libs-snapshots-local/"
-		}
-	}
 }
 
 bintray {
@@ -89,34 +105,28 @@ bintray {
 	publications = ["maven"]
 	pkg {
 		repo = "gradle-plugins"
-		name = "bootstrap-framework"
-		desc = "Gradle plugin for integrating the Bootstrap Framework and Font Awesome"
-		websiteUrl = "https://github.com/kensiprell/bootstrap-framework"
+		name = artifactId
+		desc = description
+		websiteUrl = websiteUrl
 		issueTrackerUrl = "https://github.com/kensiprell/bootstrap-framework/issues"
-		vcsUrl = "https://github.com/kensiprell/bootstrap-framework.git"
+		vcsUrl = vcsUrl
 		licenses = ["Apache-2.0"]
-		labels = ["bootstrap", "fontawesome", "font-awesome", "gradle"]
+		labels = labels
 		publicDownloadNumbers = true
 	}
 }
 
+pluginBundle {
+	website = websiteUrl
+	vcsUrl = vcsUrl
+	description = description
+	tags = labels
 
-//TODO
-// https://plugins.gradle.org/docs/submit
-
-task sourcesJar(type: Jar) {
-	classifier = "sources"
-	from sourceSets.main.allSource
-}
-
-task(console, dependsOn: "classes", type: JavaExec) {
-	main = "groovy.ui.Console"
-	classpath = sourceSets.main.runtimeClasspath
-}
-
-test {
-	testLogging {
-		showStandardStreams = true
+	plugins {
+		bootstrapFrameworkPlugin {
+			id = "com.siprell.plugins.bootstrap-framework"
+			displayName = "Bootstrap Framework Plugin for Gradle"
+		}
 	}
 }
 
