@@ -164,11 +164,11 @@ class GradlePluginSpec extends Specification {
 		def data = currentData
 
 		then:
-		data.bootstrapAllJs.exists()
+		data.bootstrapJsAll.exists()
 		data.javascriptsCount == 2
 		data.bootstrapJs.exists()
 		data.jsCount == 1
-		data.bootstrapAllCss.exists()
+		data.bootstrapCssAll.exists()
 		!data.bootstrapLessLess.exists()
 		data.stylesheetsCount == 2
 		data.stylesheetsBootstrapCount == 2
@@ -184,7 +184,7 @@ class GradlePluginSpec extends Specification {
 		data.lessCount == 0
 		!data.mixins.exists()
 		data.mixinsCount == 0
-		!data.fontAwesomeAllCss.exists()
+		!data.fontAwesomeCssAll.exists()
 		!data.fontAwesomeLessLess.exists()
 		data.stylesheetsFontAwesomeCount == 0
 		!data.fontAwesomeCss.exists()
@@ -229,11 +229,11 @@ class GradlePluginSpec extends Specification {
 		def data = currentData
 
 		then:
-		!data.bootstrapAllJs.exists()
+		!data.bootstrapJsAll.exists()
 		data.javascriptsCount == 1
 		data.bootstrapJs.exists()
 		data.jsCount == 1
-		!data.bootstrapAllCss.exists()
+		!data.bootstrapCssAll.exists()
 		!data.bootstrapLessLess.exists()
 		data.stylesheetsCount == 1
 		data.stylesheetsBootstrapCount == 2
@@ -249,7 +249,7 @@ class GradlePluginSpec extends Specification {
 		data.lessCount == 0
 		!data.mixins.exists()
 		data.mixinsCount == 0
-		!data.fontAwesomeAllCss.exists()
+		!data.fontAwesomeCssAll.exists()
 		!data.fontAwesomeLessLess.exists()
 		data.stylesheetsFontAwesomeCount == 0
 		!data.fontAwesomeCss.exists()
@@ -267,11 +267,11 @@ class GradlePluginSpec extends Specification {
 		def data = currentData
 
 		then:
-		data.bootstrapAllJs.exists()
+		data.bootstrapJsAll.exists()
 		data.javascriptsCount == 2
 		data.bootstrapJs.exists()
 		data.jsCount == 13
-		data.bootstrapAllCss.exists()
+		data.bootstrapCssAll.exists()
 		!data.bootstrapLessLess.exists()
 		data.stylesheetsCount == 2
 		data.stylesheetsBootstrapCount == 2
@@ -287,7 +287,7 @@ class GradlePluginSpec extends Specification {
 		data.lessCount == 0
 		!data.mixins.exists()
 		data.mixinsCount == 0
-		!data.fontAwesomeAllCss.exists()
+		!data.fontAwesomeCssAll.exists()
 		!data.fontAwesomeLessLess.exists()
 		data.stylesheetsFontAwesomeCount == 0
 		!data.fontAwesomeCss.exists()
@@ -305,11 +305,11 @@ class GradlePluginSpec extends Specification {
 		def data = currentData
 
 		then:
-		data.bootstrapAllJs.exists()
+		data.bootstrapJsAll.exists()
 		data.javascriptsCount == 2
 		data.bootstrapJs.exists()
 		data.jsCount == 1
-		data.bootstrapAllCss.exists()
+		data.bootstrapCssAll.exists()
 		data.bootstrapLessLess.exists()
 		data.stylesheetsCount == 3
 		data.stylesheetsBootstrapCount == 3
@@ -325,7 +325,7 @@ class GradlePluginSpec extends Specification {
 		data.lessCount == 42
 		data.mixins.exists()
 		data.mixinsCount == 30
-		!data.fontAwesomeAllCss.exists()
+		!data.fontAwesomeCssAll.exists()
 		!data.fontAwesomeLessLess.exists()
 		data.stylesheetsFontAwesomeCount == 0
 		!data.fontAwesomeCss.exists()
@@ -344,11 +344,11 @@ class GradlePluginSpec extends Specification {
 		def data = currentData
 
 		then:
-		data.bootstrapAllJs.exists()
+		data.bootstrapJsAll.exists()
 		data.javascriptsCount == 2
 		data.bootstrapJs.exists()
 		data.jsCount == 13
-		data.bootstrapAllCss.exists()
+		data.bootstrapCssAll.exists()
 		data.bootstrapLessLess.exists()
 		data.stylesheetsCount == 3
 		data.stylesheetsBootstrapCount == 3
@@ -364,7 +364,7 @@ class GradlePluginSpec extends Specification {
 		data.lessCount == 42
 		data.mixins.exists()
 		data.mixinsCount == 30
-		!data.fontAwesomeAllCss.exists()
+		!data.fontAwesomeCssAll.exists()
 		!data.fontAwesomeLessLess.exists()
 		data.stylesheetsFontAwesomeCount == 0
 		!data.fontAwesomeCss.exists()
@@ -398,11 +398,11 @@ class GradlePluginSpec extends Specification {
 		def data = currentData
 
 		then:
-		data.bootstrapAllJs.exists()
+		data.bootstrapJsAll.exists()
 		data.javascriptsCount == 2
 		data.bootstrapJs.exists()
 		data.jsCount == 1
-		data.bootstrapAllCss.exists()
+		data.bootstrapCssAll.exists()
 		data.bootstrapLessLess.exists()
 		data.stylesheetsCount == 5
 		data.stylesheetsBootstrapCount == 2
@@ -418,7 +418,7 @@ class GradlePluginSpec extends Specification {
 		data.lessCount == 0
 		!data.mixins.exists()
 		data.mixinsCount == 0
-		data.fontAwesomeAllCss.exists()
+		data.fontAwesomeCssAll.exists()
 		!data.fontAwesomeLessLess.exists()
 		data.fontAwesomeCss.exists()
 		data.fontAwesomeFonts.exists()
@@ -436,11 +436,11 @@ class GradlePluginSpec extends Specification {
 		def data = currentData
 
 		then:
-		data.bootstrapAllJs.exists()
+		data.bootstrapJsAll.exists()
 		data.javascriptsCount == 2
 		data.bootstrapJs.exists()
 		data.jsCount == 1
-		data.bootstrapAllCss.exists()
+		data.bootstrapCssAll.exists()
 		data.bootstrapLessLess.exists()
 		data.stylesheetsCount == 6
 		data.stylesheetsBootstrapCount == 2
@@ -456,7 +456,7 @@ class GradlePluginSpec extends Specification {
 		data.lessCount == 0
 		!data.mixins.exists()
 		data.mixinsCount == 0
-		data.fontAwesomeAllCss.exists()
+		data.fontAwesomeCssAll.exists()
 		data.fontAwesomeLessLess.exists()
 		data.stylesheetsFontAwesomeCount == 3
 		data.fontAwesomeCss.exists()
@@ -580,11 +580,11 @@ class GradlePluginSpec extends Specification {
 	}
 
 	static getCurrentData() {
-		def bootstrapAllJs = new File("${filePath.javascripts}/bootstrap-all.js")
+		def bootstrapJsAll = new File("${filePath.javascripts}/bootstrap-all.js")
 		def javascriptsCount = new File(filePath.javascripts).listFiles().size()
 		def bootstrapJs = new File("${filePath.js}/bootstrap.js")
 		def jsCount = new File(filePath.js).listFiles().size()
-		def bootstrapAllCss = new File("${filePath.stylesheets}/bootstrap-all.css")
+		def bootstrapCssAll = new File("${filePath.stylesheets}/bootstrap-all.css")
 		def bootstrapLessLess = new File("${filePath.stylesheets}/bootstrap-less.less")
 		def stylesheetsCount = new File(filePath.stylesheets).listFiles().size()
 		def stylesheetsBootstrapCount = new File("${filePath.stylesheets}/bootstrap").listFiles().size()
@@ -600,7 +600,7 @@ class GradlePluginSpec extends Specification {
 		def lessCount = less.exists() ? less.listFiles().size() : 0
 		def mixins = new File(filePath.mixins)
 		def mixinsCount = mixins.exists() ? mixins.listFiles().size() : 0
-		def fontAwesomeAllCss = new File("${filePath.stylesheets}/font-awesome-all.css")
+		def fontAwesomeCssAll = new File("${filePath.stylesheets}/font-awesome-all.css")
 		def fontAwesomeLessLess = new File("${filePath.stylesheets}/font-awesome-less.less")
 		def stylesheetsFontAwesome = new File("${filePath.stylesheets}/font-awesome")
 		def stylesheetsFontAwesomeCount = stylesheetsFontAwesome.exists() ? stylesheetsFontAwesome.listFiles().size() : 0
@@ -610,11 +610,11 @@ class GradlePluginSpec extends Specification {
 		def fontAwesomeLess = new File(filePath.faLess)
 		def fontAwesomeLessCount = fontAwesomeLess.exists() ? fontAwesomeLess.listFiles().size() : 0
 		[
-			bootstrapAllJs             : bootstrapAllJs,
+			bootstrapJsAll             : bootstrapJsAll,
 			javascriptsCount           : javascriptsCount,
 			bootstrapJs                : bootstrapJs,
 			jsCount                    : jsCount,
-			bootstrapAllCss            : bootstrapAllCss,
+			bootstrapCssAll            : bootstrapCssAll,
 			bootstrapLessLess          : bootstrapLessLess,
 			stylesheetsCount           : stylesheetsCount,
 			stylesheetsBootstrapCount  : stylesheetsBootstrapCount,
@@ -630,7 +630,7 @@ class GradlePluginSpec extends Specification {
 			lessCount                  : lessCount,
 			mixins                     : mixins,
 			mixinsCount                : mixinsCount,
-			fontAwesomeAllCss          : fontAwesomeAllCss,
+			fontAwesomeCssAll          : fontAwesomeCssAll,
 			fontAwesomeLessLess        : fontAwesomeLessLess,
 			stylesheetsFontAwesomeCount: stylesheetsFontAwesomeCount,
 			fontAwesomeCss             : fontAwesomeCss,
