@@ -66,7 +66,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 			} else if (file instanceof String) {
 				throw new InvalidUserDataException(file)
 			} else {
-				throw new InvalidUserDataException("An unknow error occured trying to download $url")
+				throw new InvalidUserDataException("An unknown error occurred trying to download $url")
 			}
 		}
 
@@ -82,7 +82,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 				} else if (file instanceof String) {
 					throw new InvalidUserDataException(file)
 				} else {
-					throw new InvalidUserDataException("An unknow error occured trying to download $url")
+					throw new InvalidUserDataException("An unknown error occurred trying to download $url")
 				}
 			}
 		}
