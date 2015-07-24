@@ -94,6 +94,9 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 				from template.getFile(project, "createBootstrapJsAll")
 				rename ".*", filename
 				into path
+				onlyIf {
+					!project.file("$path/$filename").exists()
+				}
 			} else {
 				project.delete("$path/$filename")
 			}
@@ -121,6 +124,9 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 				from template.getFile(project, "createBootstrapCssAll")
 				rename ".*", filename
 				into path
+				onlyIf {
+					!project.file("$path/$filename").exists()
+				}
 			} else {
 				project.delete("$path/$filename")
 			}
@@ -158,6 +164,9 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 				from template.getFile(project, "createBootstrapLessLess")
 				rename ".*", filename
 				into path
+				onlyIf {
+					!project.file("$path/$filename").exists()
+				}
 			}
 		}
 
@@ -200,6 +209,9 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 				from template.getFile(project, "createFontAwesomeCssAll")
 				rename ".*", filename
 				into path
+				onlyIf {
+					!project.file("$path/$filename").exists()
+				}
 			} else {
 				project.delete("$path/$filename")
 			}
@@ -237,14 +249,19 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		}
 
 		project.task("createFontAwesomeLessLess", type: Copy, dependsOn: project.tasks.createFontAwesomeFonts) {
+			def path = "${project.projectDir}/$cssPath"
+			def filename = "font-awesome-less.less"
 			if (fontAwesomeInstall && fontAwesomeUseLess) {
 				if (cssPath.contains("assets")) {
 					from template.getFile(project, "createFontAwesomeLessLessAssets")
 				} else {
 					from template.getFile(project, "createFontAwesomeLessLess")
 				}
-				rename ".*", "font-awesome-less.less"
-				into "${project.projectDir}/$cssPath"
+				rename ".*", filename
+				into path
+				onlyIf {
+					!project.file("$path/$filename").exists()
+				}
 			}
 		}
 
