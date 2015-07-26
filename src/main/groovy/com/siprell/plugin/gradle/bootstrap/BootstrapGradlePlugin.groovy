@@ -25,6 +25,11 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		boolean useLess = properties.useLess ?: false
 		String jsPath = properties.jsPath ? properties.jsPath : "grails-app/assets/javascripts"
 		String cssPath = properties.cssPath ? properties.cssPath : "grails-app/assets/stylesheets"
+		String bootstrapJsPath = "${project.projectDir}/$jsPath/bootstrap"
+		String bootstrapCssPath = "${project.projectDir}/$cssPath/bootstrap/css"
+		String bootstrapFontsPath = "${project.projectDir}/$cssPath/bootstrap/fonts"
+		String bootstrapLessPath = "${project.projectDir}/$cssPath/bootstrap/less"
+		String bootstrapMixinsPath = "$bootstrapLessPath/mixins"
 		boolean useAssetPipeline = jsPath.contains("assets")
 		boolean bootstrapInvalidVersionFails = properties.invalidVersionFails ?: false
 		FileTree bootstrapZipTree
@@ -35,6 +40,10 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		String fontAwesomeVersion = fontAwesome?.version ?: FA_DEFAULT_VERSION
 		boolean fontAwesomeUseLess = fontAwesome?.useLess ?: false
 		boolean fontAwesomeInvalidVersionFails = fontAwesome?.invalidVersionFails ?: false
+		String fontAwesomePath = "${project.projectDir}/$cssPath/font-awesome"
+		String fontAwesomeCssPath = "$fontAwesomePath/css"
+		String fontAwesomeFontsPath = "$fontAwesomePath/fonts"
+		String fontAwesomeLessPath = "$fontAwesomePath/less"
 		FileTree fontAwesomeZipTree
 
 		project.afterEvaluate {
@@ -87,7 +96,39 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 			}
 		}
 
-		project.task("createBootstrapJsAll", type: Copy, dependsOn: project.tasks.downloadFontAwesomeZip) {
+		project.task("manageBootstrapDirs", type: Copy, dependsOn: project.tasks.downloadFontAwesomeZip) {
+			if (!project.file(bootstrapJsPath).exists()) {
+				project.mkdir(bootstrapJsPath)
+			}
+			if (!project.file(bootstrapCssPath).exists()) {
+				project.mkdir(bootstrapCssPath)
+			}
+			["css", "fonts"].each {
+				if (!project.file("$bootstrapCssPath/$it").exists()) {
+					project.mkdir("$bootstrapCssPath/$it")
+				}
+			}
+			if (useLess) {
+				if (!project.file(bootstrapMixinsPath).exists()) {
+					project.mkdir(bootstrapMixinsPath)
+				}
+			} else {
+				project.delete(bootstrapLessPath)
+			}
+			if (fontAwesomeInstall) {
+				def dirs = ["css", "fonts"]
+				if (fontAwesomeUseLess) {
+					dirs << "less"
+				}
+				dirs.each {
+					project.mkdir("$fontAwesomePath/$it")
+				}
+			} else {
+				project.delete(fontAwesomePath)
+			}
+		}
+
+		project.task("createBootstrapJsAll", type: Copy, dependsOn: project.tasks.manageBootstrapDirs) {
 			def path = "${project.projectDir}/$jsPath"
 			def filename = "bootstrap-all.js"
 			if (useAssetPipeline) {
@@ -103,10 +144,6 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		}
 
 		project.task("createBootstrapJs", type: Sync, dependsOn: project.tasks.createBootstrapJsAll) {
-			def path = "${project.projectDir}/$jsPath/bootstrap"
-			if (!project.file(path).exists()) {
-				project.mkdir(path)
-			}
 			def files = bootstrapZipTree.matching {
 				include "*/dist/js/bootstrap.js"
 				if (useIndividualJs) {
@@ -114,7 +151,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 				}
 			}.collect()
 			from files
-			into path
+			into bootstrapJsPath
 		}
 
 		project.task("createBootstrapCssAll", type: Copy, dependsOn: project.tasks.createBootstrapJs) {
@@ -132,29 +169,21 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 			}
 		}
 
-		project.task("createBootstrapFonts", type: Copy, dependsOn: project.tasks.createBootstrapCssAll) {
-			def path = "${project.projectDir}/$cssPath/bootstrap/fonts"
-			if (!project.file(path).exists()) {
-				project.mkdir(path)
-			}
+		project.task("createBootstrapFonts", type: Sync, dependsOn: project.tasks.createBootstrapCssAll) {
 			def files = bootstrapZipTree.matching {
 				include "*/fonts/*"
 			}.collect()
 			from files
-			into path
+			into bootstrapFontsPath
 		}
 
-		project.task("createBootstrapCssIndividual", type: Copy, dependsOn: project.tasks.createBootstrapFonts) {
-			def path = "${project.projectDir}/$cssPath/bootstrap/css"
-			if (!project.file(path).exists()) {
-				project.mkdir(path)
-			}
+		project.task("createBootstrapCssIndividual", type: Sync, dependsOn: project.tasks.createBootstrapFonts) {
 			def files = bootstrapZipTree.matching {
 				include "*/dist/css/*.css"
 				exclude "*/dist/css/*.min.css"
 			}.collect()
 			from files
-			into path
+			into bootstrapCssPath
 		}
 
 		project.task("createBootstrapLessLess", type: Copy, dependsOn: project.tasks.createBootstrapCssIndividual) {
@@ -171,27 +200,17 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		}
 
 		project.task("createBootstrapLess", type: Sync, dependsOn: project.tasks.createBootstrapLessLess) {
-			def path = "${project.projectDir}/$cssPath/bootstrap/less"
+			def files = []
 			if (useLess) {
-				def files = bootstrapZipTree.matching {
+				files = bootstrapZipTree.matching {
 					include "*/less/*.less"
 				}.collect()
-				from files
-				into path
-			} else {
-				project.delete(path)
 			}
+			from files
+			into bootstrapLessPath
 		}
 
 		project.task("createBootstrapMixins", type: Sync, dependsOn: project.tasks.createBootstrapLess) {
-			def lessPath = "${project.projectDir}/$cssPath/bootstrap/less"
-			def path = "$lessPath/mixins"
-			if (useLess && !project.file(path).exists()) {
-				project.mkdir(path)
-			}
-			if (!useLess && project.file(lessPath).exists()) {
-				project.delete(lessPath)
-			}
 			def files = []
 			if (useLess) {
 				files = bootstrapZipTree.matching {
@@ -199,7 +218,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 				}.collect()
 			}
 			from files
-			into path
+			into bootstrapMixinsPath
 		}
 
 		project.task("createFontAwesomeCssAll", type: Copy, dependsOn: project.tasks.createBootstrapMixins) {
@@ -217,35 +236,26 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 			}
 		}
 
-		project.task("createFontAwesomeCssIndividual", type: Copy, dependsOn: project.tasks.createFontAwesomeCssAll) {
-			def path = "${project.projectDir}/$cssPath/font-awesome/css"
+		project.task("createFontAwesomeCssIndividual", type: Sync, dependsOn: project.tasks.createFontAwesomeCssAll) {
 			def files = []
 			if (fontAwesomeInstall) {
-				if (!project.file(path).exists()) {
-					project.mkdir(path)
-				}
 				files = fontAwesomeZipTree.matching {
 					include "*/css/font-awesome.css"
 				}.collect()
 			}
 			from files
-			into path
+			into fontAwesomeCssPath
 		}
 
 		project.task("createFontAwesomeFonts", type: Sync, dependsOn: project.tasks.createFontAwesomeCssIndividual) {
-			def path = "${project.projectDir}/$cssPath/font-awesome/fonts"
+			def files = []
 			if (fontAwesomeInstall) {
-				if (!project.file(path).exists()) {
-					project.mkdir(path)
-				}
-				def files = fontAwesomeZipTree.matching {
+				files = fontAwesomeZipTree.matching {
 					include "*/fonts/*"
 				}.collect()
-				from files
-				into path
-			} else {
-				project.delete("${project.projectDir}/$cssPath/font-awesome")
 			}
+			from files
+			into fontAwesomeFontsPath
 		}
 
 		project.task("createFontAwesomeLessLess", type: Copy, dependsOn: project.tasks.createFontAwesomeFonts) {
@@ -266,16 +276,14 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		}
 
 		project.task("createFontAwesomeLess", type: Sync, dependsOn: project.tasks.createFontAwesomeLessLess) {
-			def path = "${project.projectDir}/$cssPath/font-awesome/less"
+			def files = []
 			if (fontAwesomeInstall && fontAwesomeUseLess) {
-				def files = fontAwesomeZipTree.matching {
+				files = fontAwesomeZipTree.matching {
 					include "*/less/*.less"
 				}.collect()
-				from files
-				into path
-			} else {
-				project.delete(path)
 			}
+			from files
+			into fontAwesomeLessPath
 		}
 	}
 }

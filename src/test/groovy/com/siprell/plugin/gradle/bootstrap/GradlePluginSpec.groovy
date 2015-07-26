@@ -536,6 +536,7 @@ class GradlePluginSpec extends Specification {
 		project.pluginManager.apply "bootstrap-framework"
 		project.tasks["downloadBootstrapZip"].execute()
 		project.tasks["downloadFontAwesomeZip"].execute()
+		project.tasks["manageBootstrapDirs"].execute()
 		project.tasks["createBootstrapJsAll"].execute()
 		project.tasks["createBootstrapJs"].execute()
 		project.tasks["createBootstrapCssAll"].execute()
@@ -544,7 +545,6 @@ class GradlePluginSpec extends Specification {
 		project.tasks["createBootstrapLessLess"].execute()
 		project.tasks["createBootstrapLess"].execute()
 		project.tasks["createBootstrapMixins"].execute()
-		project.tasks["downloadFontAwesomeZip"].execute()
 		project.tasks["createFontAwesomeCssAll"].execute()
 		project.tasks["createFontAwesomeCssIndividual"].execute()
 		project.tasks["createFontAwesomeFonts"].execute()
