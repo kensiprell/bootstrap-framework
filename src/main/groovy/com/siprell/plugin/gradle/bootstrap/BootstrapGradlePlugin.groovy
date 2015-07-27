@@ -135,9 +135,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 				from template.getFile(project, "createBootstrapJsAll")
 				rename ".*", filename
 				into path
-				onlyIf {
-					!project.file("$path/$filename").exists()
-				}
+				onlyIf { !project.file("$path/$filename").exists() }
 			} else {
 				project.delete("$path/$filename")
 			}
@@ -161,9 +159,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 				from template.getFile(project, "createBootstrapCssAll")
 				rename ".*", filename
 				into path
-				onlyIf {
-					!project.file("$path/$filename").exists()
-				}
+				onlyIf { !project.file("$path/$filename").exists() }
 			} else {
 				project.delete("$path/$filename")
 			}
@@ -193,9 +189,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 				from template.getFile(project, "createBootstrapLessLess")
 				rename ".*", filename
 				into path
-				onlyIf {
-					!project.file("$path/$filename").exists()
-				}
+				onlyIf { !project.file("$path/$filename").exists() }
 			}
 		}
 
@@ -228,9 +222,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 				from template.getFile(project, "createFontAwesomeCssAll")
 				rename ".*", filename
 				into path
-				onlyIf {
-					!project.file("$path/$filename").exists()
-				}
+				onlyIf { !project.file("$path/$filename").exists() }
 			} else {
 				project.delete("$path/$filename")
 			}
@@ -269,9 +261,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 				}
 				rename ".*", filename
 				into path
-				onlyIf {
-					!project.file("$path/$filename").exists()
-				}
+				onlyIf { !project.file("$path/$filename").exists() }
 			}
 		}
 
