@@ -103,10 +103,8 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 			if (!project.file(bootstrapCssPath).exists()) {
 				project.mkdir(bootstrapCssPath)
 			}
-			["css", "fonts"].each {
-				if (!project.file("$bootstrapCssPath/$it").exists()) {
-					project.mkdir("$bootstrapCssPath/$it")
-				}
+			if (!project.file(bootstrapFontsPath).exists()) {
+				project.mkdir(bootstrapFontsPath)
 			}
 			if (useLess) {
 				if (!project.file(bootstrapMixinsPath).exists()) {
@@ -119,6 +117,8 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 				def dirs = ["css", "fonts"]
 				if (fontAwesomeUseLess) {
 					dirs << "less"
+				} else {
+				    project.delete("$fontAwesomePath/less")
 				}
 				dirs.each {
 					project.mkdir("$fontAwesomePath/$it")
