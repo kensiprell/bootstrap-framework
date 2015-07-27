@@ -118,7 +118,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 				if (fontAwesomeUseLess) {
 					dirs << "less"
 				} else {
-				    project.delete("$fontAwesomePath/less")
+				    project.delete(fontAwesomeLessPath)
 				}
 				dirs.each {
 					project.mkdir("$fontAwesomePath/$it")
