@@ -466,6 +466,96 @@ class GradlePluginSpec extends Specification {
 		data.fontAwesomeLessCount == 13
 	}
 
+	void "apply plugin with all options enabled and delete files"() {
+		given:
+		def properties = defaultProperties
+		properties.useIndividualJs = true
+		properties.useLess = true
+		properties.fontAwesome.install = true
+		properties.fontAwesome.useLess = true
+
+		when:
+		createProject(properties)
+		def data = currentData
+
+		then:
+		data.bootstrapJsAll.exists()
+		data.javascriptsCount == 2
+		data.bootstrapJs.exists()
+		data.jsCount == 13
+		data.bootstrapCssAll.exists()
+		data.bootstrapLessLess.exists()
+		data.stylesheetsCount == 6
+		data.stylesheetsBootstrapCount == 3
+		data.bootstrapCss.exists()
+		data.bootstrapThemeCss.exists()
+		data.css.exists()
+		data.cssCount == 2
+		data.fonts.exists()
+		data.fontsCount == 5
+		data.bootstrapLess.exists()
+		data.mixinsLess.exists()
+		data.less.exists()
+		data.lessCount == 42
+		data.mixins.exists()
+		data.mixinsCount == 30
+		data.fontAwesomeCssAll.exists()
+		data.fontAwesomeLessLess.exists()
+		data.stylesheetsFontAwesomeCount == 3
+		data.fontAwesomeCss.exists()
+		data.fontAwesomeFonts.exists()
+		data.fontAwesomeFontsCount == 6
+		data.fontAwesomeLess.exists()
+		data.fontAwesomeLessCount == 13
+
+		when:
+		new File("${filePath.javascripts}/bootstrap-all.js").delete()
+		new File("${filePath.js}/affix.js").delete()
+		new File("${filePath.stylesheets}/bootstrap-all.css").delete()
+		new File("${filePath.stylesheets}/bootstrap-less.less").delete()
+		new File("${filePath.stylesheets}/font-awesome-all.css").delete()
+		new File("${filePath.stylesheets}/font-awesome-less.less").delete()
+		new File("${filePath.css}/bootstrap.css").delete()
+		new File("${filePath.fonts}/glyphicons-halflings-regular.eot").delete()
+		new File("${filePath.less}/alerts.less").delete()
+		new File("${filePath.mixins}/alerts.less").delete()
+		new File("${filePath.faCss}/font-awesome.css").delete()
+		new File("${filePath.faFonts}/fontawesome-webfont.eot").delete()
+		new File("${filePath.faLess}/animated.less").delete()
+		createProject(properties)
+		data = currentData
+
+		then:
+		data.bootstrapJsAll.exists()
+		data.javascriptsCount == 2
+		data.bootstrapJs.exists()
+		data.jsCount == 13
+		data.bootstrapCssAll.exists()
+		data.bootstrapLessLess.exists()
+		data.stylesheetsCount == 6
+		data.stylesheetsBootstrapCount == 3
+		data.bootstrapCss.exists()
+		data.bootstrapThemeCss.exists()
+		data.css.exists()
+		data.cssCount == 2
+		data.fonts.exists()
+		data.fontsCount == 5
+		data.bootstrapLess.exists()
+		data.mixinsLess.exists()
+		data.less.exists()
+		data.lessCount == 42
+		data.mixins.exists()
+		data.mixinsCount == 30
+		data.fontAwesomeCssAll.exists()
+		data.fontAwesomeLessLess.exists()
+		data.stylesheetsFontAwesomeCount == 3
+		data.fontAwesomeCss.exists()
+		data.fontAwesomeFonts.exists()
+		data.fontAwesomeFontsCount == 6
+		data.fontAwesomeLess.exists()
+		data.fontAwesomeLessCount == 13
+	}
+
 	void "use invalid Font Awesome version with invalidVersionFails = false and zip files are available"() {
 		given:
 		def version = "3.2.99"
