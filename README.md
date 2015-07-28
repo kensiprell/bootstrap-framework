@@ -1,8 +1,8 @@
-## Gradle plugin for integrating the Bootstrap Framework and Font Awesome
+### Gradle plugin for integrating the Bootstrap Framework and Font Awesome
 
 [Bootstrap](http://getbootstrap.com) bills itself as "the most popular HTML, CSS, and JS framework for developing responsive, mobile first projects on the web."
 
-[Font Awesome](http://fortawesome.github.io/Font-Awesome/) is the iconic font and CSS toolkit.
+[Font Awesome](http://fortawesome.github.io/Font-Awesome/) is the "iconic font and CSS toolkit."
 
 If you have a question, suggestion, or want to report a bug, please submit an [issue](https://github.com/kensiprell/bootstrap-framework/issues). I will reply as soon as I can.
 
@@ -135,9 +135,9 @@ You can add LESS support for Font Awesome by setting the ```bootstrapFramework.f
 
 The plugin downloads the appropriate Bootstrap or Font Awesome zip file and copies it to your application's ```build/tmp``` directory. The plugin will extract the necessary files and copy them to the directories defined by the ```bootstrapFramework.cssPath``` and ```bootstrapFramework.jsPath``` properties.
 
-The files are copied into the directory trees shown below. It is important that you do not put any files in the two ```bootstrap``` directories (```bootstrapFramework.cssPath``` and ```bootstrapFramework.jsPath```) because they will be overwritten.
+The files are copied into the directory trees shown below. It is important that you do not put any files in the two ```bootstrap``` directories (```"${bootstrapFramework.cssPath}/bootstrap"``` and ```"${bootstrapFramework.jsPath}/bootstrap"```) or the ```font-awesome``` directory (```"${bootstrapFramework.cssPath}/font-awesome"```) because they will be overwritten.
 
-The ```bootstrap-all.js```, ```bootstrap-all.css```, and ```bootstrap-less.less``` files are generated for the asset-pipeline plugin if you are using Grails or the word "assets" is contained in the ```bootstrapFramework.jsPath``` property.
+The ```bootstrap-all.js```, ```bootstrap-all.css```, ```bootstrap-less.less```, ```font-awesome-all.css```, and ```font-awesome-less.less``` files are generated for the asset-pipeline plugin if you are using Grails or the word "assets" is contained in the ```bootstrapFramework.jsPath``` property.
 
 Directory ```bootstrapFramework.jsPath```:
 
@@ -169,7 +169,7 @@ Directory ```bootstrapFramework.cssPath```:
     |    |    |    |    etc.
     |    font-awesome-all.css
     |    font-awesome-less.less
-    |    font-awesome/
+    |----font-awesome/
     |    |----css/
     |    |    |    font-awesome.css
     |    |----fonts/
@@ -196,7 +196,7 @@ The output will be similar to:
    
 ### Glyphicons
 
-The Glyphicons icons are available as described in the [Bootstrap Components](http://getbootstrap.com/components/) section.
+The Glyphicons icons are available as described in the [Bootstrap Components](http://getbootstrap.com/components/) section of the Bootstrap Framework documentation.
 
 ### Asset Pipeline Usage
 
@@ -206,7 +206,7 @@ The remaining sections outline how to include Bootstrap Framework and Font Aweso
 
 The instructions below assume the manifest file is in the ```grails-app/assets/javascripts``` directory.
 
-#### Add all Bootstrap JavaScript Files
+##### Add all Bootstrap JavaScript Files
 
 Add the line below to a manifest:
 
@@ -216,9 +216,9 @@ Or add the line below to a GSP:
 
     <asset:javascript src="bootstrap-all.js"/>
 
-#### Add individual Bootstrap JavaScript files
+##### Add individual Bootstrap JavaScript files
 
-Ensure you set the parameter below to true as described above:
+Ensure you set the parameter below to true as described [above](https://github.com/kensiprell/bootstrap-framework#bootstrapframeworkuseindividualjs):
 
     bootstrapFrameworkUseIndividualJs = true
 
@@ -234,7 +234,7 @@ Or add the line below to a GSP:
 
 The instructions below assume the manifest file is in the ```grails-app/assets/stylesheets``` directory.
 
-#### Add all Bootstrap and Font Awesome CSS Files
+##### Add all Bootstrap and Font Awesome CSS Files
 
 Add the lines below to a manifest:
 
@@ -246,7 +246,7 @@ Or add the lines below to a GSP:
     <asset:stylesheet src="bootstrap-all.css"/>
     <asset:stylesheet src="font-awesome-all.css"/>
 
-#### Add individual Bootstrap CSS Files
+##### Add individual Bootstrap CSS Files
 
 Add the line below to a manifest:
 
@@ -272,9 +272,9 @@ Or add the line below to a GSP:
 
 #### LESS Customizations
 
-If LESS support configured, the plugin creates the files below in your application's ```grails-app/assets/stylesheets``` directory when it is first installed. 
+If LESS support is configured for either Bootstrap Framework or Font Awesome, the plugin will create the appropriate LESS file in your application's ```bootstrapFramework.cssPath``` directory. If you later decide not to use LESS, the plugin will delete the LESS and mixin files, but it will not delete the ```bootstrap-less.less``` or the ```font-awesome-less.less``` file. Should you decide to turn LESS support back on, your customized LESS files will still be available.
 
-Use the file below for customizing the Bootstrap Framework.
+Use ```bootstrap-less.less``` for customizing the Bootstrap Framework:
 
     /*
     * This file is for your Bootstrap Framework less and mixin customizations.
@@ -292,7 +292,7 @@ Use the file below for customizing the Bootstrap Framework.
     * Your customizations go below this section.
     */
 
-Use the file below for customizing Font Awesome.
+Use ```font-awesome-less.less``` for customizing Font Awesome:
 
     * Font Awesome by Dave Gandy - http://fontawesome.io
     *
