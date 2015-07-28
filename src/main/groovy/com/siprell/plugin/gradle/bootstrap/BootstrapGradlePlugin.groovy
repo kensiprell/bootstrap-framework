@@ -79,7 +79,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 			}
 		}
 
-		project.task("downloadFontAwesomeZip", dependsOn: project.tasks.downloadBootstrapZip) {
+		project.task("downloadFontAwesomeZip") {
 			if (fontAwesomeInstall) {
 				String description = "Font Awesome"
 				String filePrefix = "fontAwesome-v"
@@ -96,7 +96,7 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 			}
 		}
 
-		project.task("manageBootstrapDirs", type: Copy, dependsOn: project.tasks.downloadFontAwesomeZip) {
+		project.task("manageBootstrapDirs") {
 			if (!project.file(bootstrapJsPath).exists()) {
 				project.mkdir(bootstrapJsPath)
 			}
