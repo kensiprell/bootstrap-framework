@@ -23,12 +23,7 @@ sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
 
 ext {
-	artifactId = "bootstrap-framework"
 	isReleaseVersion = !version.endsWith("SNAPSHOT")
-	description = "Gradle plugin for integrating the Bootstrap Framework and Font Awesome"
-	labels = ["bootstrap", "fontawesome", "font awesome", "gradle"]
-	websiteUrl = "https://github.com/kensiprell/bootstrap-framework"
-	vcsUrl = "https://github.com/kensiprell/bootstrap-framework.git"
 }
 
 repositories {
@@ -63,15 +58,15 @@ test {
 publishing {
 	publications {
 		maven(MavenPublication) {
-			artifactId artifactId
+			artifactId "bootstrap-framework"
 			pom.withXml {
 				asNode().children().last() + {
 					resolveStrategy = Closure.DELEGATE_FIRST
 					name "bootstrap-framework"
-					description description
-					url websiteUrl
+					description "Gradle plugin for integrating the Bootstrap Framework and Font Awesome"
+					url "https://github.com/kensiprell/bootstrap-framework"
 					scm {
-						url websiteUrl
+						url "https://github.com/kensiprell/bootstrap-framework"
 						connection "scm:https://github.com/kensiprell/bootstrap-framework.git"
 						developerConnection "scm:git://github.com/kensiprell/bootstrap-framework.git"
 					}
@@ -105,22 +100,22 @@ bintray {
 	publications = ["maven"]
 	pkg {
 		repo = "gradle-plugins"
-		name = artifactId
-		desc = description
-		websiteUrl = websiteUrl
+		name = "bootstrap-framework"
+		desc = "Gradle plugin for integrating the Bootstrap Framework and Font Awesome"
+		websiteUrl = "https://github.com/kensiprell/bootstrap-framework"
 		issueTrackerUrl = "https://github.com/kensiprell/bootstrap-framework/issues"
-		vcsUrl = vcsUrl
+		vcsUrl = "https://github.com/kensiprell/bootstrap-framework.git"
 		licenses = ["Apache-2.0"]
-		labels = labels
+		labels = ["bootstrap", "fontawesome", "font awesome", "gradle"]
 		publicDownloadNumbers = true
 	}
 }
 
 pluginBundle {
-	website = websiteUrl
-	vcsUrl = vcsUrl
-	description = description
-	tags = labels
+	website = "https://github.com/kensiprell/bootstrap-framework"
+	vcsUrl = "https://github.com/kensiprell/bootstrap-framework.git"
+	description = "Gradle plugin for integrating the Bootstrap Framework and Font Awesome"
+	tags = ["bootstrap", "fontawesome", "font awesome", "gradle"]
 
 	plugins {
 		bootstrapFrameworkPlugin {
