@@ -49,7 +49,7 @@ Add the following lines to your application's ```build.gradle``` file. The comme
         }
     }
 
-    apply plugin: "bootstrap-framework"
+    apply plugin: "com.siprell.plugins.bootstrap-framework"
         
 ### Configuration Options
 
