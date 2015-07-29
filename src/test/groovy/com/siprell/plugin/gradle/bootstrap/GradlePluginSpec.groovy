@@ -623,7 +623,7 @@ class GradlePluginSpec extends Specification {
 	static createProject(properties) {
 		Project project = ProjectBuilder.builder().withProjectDir(new File(filePath.root)).build()
 		project.ext.bootstrapFramework = properties
-		project.pluginManager.apply "bootstrap-framework"
+		project.pluginManager.apply "com.siprell.plugins.bootstrap-framework"
 		project.tasks["downloadBootstrapZip"].execute()
 		project.tasks["downloadFontAwesomeZip"].execute()
 		project.tasks["manageBootstrapDirs"].execute()
