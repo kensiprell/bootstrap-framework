@@ -21,8 +21,8 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 
 		// Bootstrap Framework properties
 		String bootstrapVersion = properties.version ?: BOOTSTRAP_DEFAULT_VERSION
-		boolean useIndividualJs = properties.useIndividualJs ?: false
-		boolean useLess = properties.useLess ?: false
+		boolean useIndividualJs = properties.useIndividualJs != null ? properties.useIndividualJs : false
+		boolean useLess = properties.useLess != null ? properties.useLess : false
 		String jsPath = properties.jsPath ? properties.jsPath : "grails-app/assets/javascripts"
 		String cssPath = properties.cssPath ? properties.cssPath : "grails-app/assets/stylesheets"
 		String bootstrapJsPath = "${project.projectDir}/$jsPath/bootstrap"
@@ -31,15 +31,15 @@ class BootstrapGradlePlugin implements Plugin<Project> {
 		String bootstrapLessPath = "${project.projectDir}/$cssPath/bootstrap/less"
 		String bootstrapMixinsPath = "$bootstrapLessPath/mixins"
 		boolean useAssetPipeline = jsPath.contains("assets")
-		boolean bootstrapInvalidVersionFails = properties.invalidVersionFails ?: false
+		boolean bootstrapInvalidVersionFails = properties.invalidVersionFails != null ? properties.invalidVersionFails : false
 		FileTree bootstrapZipTree
 
 		// Font Awesome properties
 		def fontAwesome = properties.fontAwesome
-		boolean fontAwesomeInstall = fontAwesome?.install ?: false
+		boolean fontAwesomeInstall = fontAwesome?.install != null ? fontAwesome.install : false
 		String fontAwesomeVersion = fontAwesome?.version ?: FA_DEFAULT_VERSION
-		boolean fontAwesomeUseLess = fontAwesome?.useLess ?: false
-		boolean fontAwesomeInvalidVersionFails = fontAwesome?.invalidVersionFails ?: false
+		boolean fontAwesomeUseLess = fontAwesome?.useLess != null ? fontAwesome.useLess : false
+		boolean fontAwesomeInvalidVersionFails = fontAwesome?.invalidVersionFails != null ? fontAwesome.invalidVersionFails : false
 		String fontAwesomePath = "${project.projectDir}/$cssPath/font-awesome"
 		String fontAwesomeCssPath = "$fontAwesomePath/css"
 		String fontAwesomeFontsPath = "$fontAwesomePath/fonts"
