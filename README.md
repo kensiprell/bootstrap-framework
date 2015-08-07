@@ -45,7 +45,7 @@ Add the following lines to your application's ```build.gradle``` file. The comme
             jcenter()
         }
         dependencies {
-            classpath "com.siprell.plugins:bootstrap-framework:1.0.0"
+            classpath "com.siprell.plugins:bootstrap-framework:1.0.2"
         }
     }
 
