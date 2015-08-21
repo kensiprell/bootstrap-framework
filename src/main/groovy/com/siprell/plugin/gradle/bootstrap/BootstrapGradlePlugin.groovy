@@ -392,7 +392,7 @@ class ZipFile {
 		def invalidVersionMessage = "Could not download $url.\n$version is an invalid $description version, or you are not connected to the Internet."
 		def tmpDir = new File("$tmp")
 		if (!tmpDir.exists()) {
-			tmpDir.mkdir()
+			tmpDir.mkdirs()
 		}
 		connection.setRequestMethod("GET")
 		if (connection.getResponseCode() == 200) {
