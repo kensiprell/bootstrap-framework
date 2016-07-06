@@ -1,3 +1,5 @@
+## This plugin is no longer maintained.
+
 ### Gradle plugin for integrating the Bootstrap Framework and Font Awesome
 
 [ ![Download](https://api.bintray.com/packages/kensiprell/gradle-plugins/bootstrap-framework/images/download.svg) ](https://bintray.com/kensiprell/gradle-plugins/bootstrap-framework/_latestVersion)
